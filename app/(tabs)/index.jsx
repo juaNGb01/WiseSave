@@ -1,16 +1,16 @@
 import { View, Text, StyleSheet, ImageBackground } from 'react-native'
 
-import icedCoffeeImg from "@/assets/images/iced-coffee.png"
+import market from "@/assets/images/market.jpg"
 
 const app = () => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={icedCoffeeImg}
+        source={market}
         resizeMode="cover"
         style={styles.image}
       >
-        <Text style={styles.text}>Coffee Shop</Text>
+        <Text style={styles.text}>Wise Save</Text>
       </ImageBackground>
     </View>
   )
