@@ -33,7 +33,7 @@ const data = [
 
 const ListItem = ({ text, icon }) => (
         <Pressable style = {styles.listItem}>
-            <IconSymbol name={icon} size={20} style={styles.iconSpacer}></IconSymbol>
+            <IconSymbol name={icon} size={22} style={styles.iconSpacer}></IconSymbol>
             <Text style={styles.textStyle}>{text}</Text>
         </Pressable>
 );
@@ -76,9 +76,9 @@ const styles = StyleSheet.create({
 
     // Estilo para o Texto
     textStyle: {
-        fontSize: 20,
+        fontSize: 22,
         color: '#333333',
-        fontWeight: '500', 
+        fontWeight: 'bold', 
         marginLeft: 15
     }
 

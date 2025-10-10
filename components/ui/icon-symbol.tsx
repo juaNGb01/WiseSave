@@ -1,5 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChartSimple, faCartShopping, faUser, faPlus, faUserPen, faLock, faEnvelope, faTrash} from "@fortawesome/free-solid-svg-icons";
+import { faChartSimple, faCartShopping, faUser, faPlus, faUserPen, faLock, faEnvelope, faTrash
+  , faFilePen
+} from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { OpaqueColorValue, StyleProp, TextStyle } from "react-native";
 
@@ -11,7 +13,8 @@ const NEW_ICONS: Record<string, IconDefinition> = {
   "userPen" : faUserPen, 
   "password": faLock, 
   "email": faEnvelope, 
-  "delete" : faTrash
+  "delete" : faTrash, 
+  "filePen" : faFilePen
   // Adicione mais ícones aqui conforme precisar
 };
 
