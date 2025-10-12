@@ -29,8 +29,8 @@ export default function Index() {
 
 
       <View style = {styles.sectionButtons}>
-        <SectionButton icon="filePen"  />
-        <SectionButton icon="filePen" />
+        <SectionButton icon="filePen" text="Sua lista de compras" backgroundColor= "rgba(56, 202, 88, 1)"/>
+        <SectionButton icon="clock" text ="Histórico de compras" backgroundColor="rgba(122, 49, 187, 1)" />
       </View>
      
 
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#38CA58",
     justifyContent: "center",
     alignItems: "center",
-    bottom: 30,
+    bottom: "15%",
     right: 30,
     elevation: 8,
     shadowColor: "#000",

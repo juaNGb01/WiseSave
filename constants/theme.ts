@@ -17,6 +17,7 @@ export const Colors = {
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
   },
+
   dark: {
     text: '#ECEDEE',
     background: '#151718',
@@ -26,6 +27,40 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+
+export const tabBarScreenOptions = {
+  tabBarActiveTintColor: "#f8f8f8ff",
+  tabBarInactiveTintColor: "#848484ff",
+  tabBarShowLabel: false,
+
+  tabBarStyle: {
+    backgroundColor: "#38CA58",
+    height: 70,  
+
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+
+    borderRadius: 50,
+
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+
+  //style individual cada icon
+  tabBarItemStyle: {
+    marginBotton: 5,
+    marginTop: 5,
+    paddingVertical: 10,
+  },
+
+
+  headerShown: false,
+}
 
 export const Fonts = Platform.select({
   ios: {

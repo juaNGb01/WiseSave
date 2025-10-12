@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import { tabBarScreenOptions } from "@/constants/theme";
+
 // Simulação de login: 'true' significa que o usuário está logado.
 const useAuth = () => ({ isAuthenticated: true });
 
@@ -32,21 +34,7 @@ export default function TabLayout() {
   // Se o usuário ESTÁ logado, mostramos as abas com o design completo.
   return (
     <Tabs
-      screenOptions={{
-        // Cor do ícone e texto da aba ATIVA
-        tabBarActiveTintColor: "#38CA58",
-
-        // Cor do ícone e texto das abas INATIVAS
-        tabBarInactiveTintColor: "#FFFFFF",
-
-        // Estilos para a barra de navegação
-        tabBarStyle: {
-          backgroundColor: "#1E1E1E",
-          borderTopWidth: 0,
-        },
-
-        headerShown: false,
-      }}
+      screenOptions={tabBarScreenOptions}
     >
       <Tabs.Screen
         name="index"
@@ -54,9 +42,11 @@ export default function TabLayout() {
           title: "Minha Lista",
           // PASSO 2: USAR O ÍCONE AQUI
           tabBarIcon: ({ color }) => (
-            <IconSymbol name="home" size={28} color={color} />
+            <IconSymbol name="home" size={35} color={color} />
           ),
+          
         }}
+
       />
       <Tabs.Screen
         name="shopList"
@@ -64,7 +54,7 @@ export default function TabLayout() {
           title: "Nova Lista",
           // PASSO 2: USAR O ÍCONE AQUI
           tabBarIcon: ({ color }) => (
-            <IconSymbol name="plus" size={28} color={color} />
+            <IconSymbol name="plus" size={35} color={color} />
           ),
         }}
       />
@@ -74,7 +64,7 @@ export default function TabLayout() {
           title: "Gastos",
           // PASSO 2: USAR O ÍCONE AQUI
           tabBarIcon: ({ color }) => (
-            <IconSymbol name="chart-simple" size={28} color={color} />
+            <IconSymbol name="chart-simple" size={35} color={color} />
           ),
         }}
       />
@@ -84,10 +74,18 @@ export default function TabLayout() {
           title: "Conta",
           // PASSO 2: USAR O ÍCONE AQUI
           tabBarIcon: ({ color }) => (
-            <IconSymbol name="user" size={28} color={color} />
+            <IconSymbol name="user" size={35} color={color} />
           ),
         }}
       />
     </Tabs>
   );
+
+
+  const styles = StyleSheet.create ({
+    navbar : {
+      
+    }
+  })
 }
+
