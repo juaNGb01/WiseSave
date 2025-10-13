@@ -42,7 +42,7 @@ export default function TabLayout() {
           title: "Minha Lista",
           // PASSO 2: USAR O ÍCONE AQUI
           tabBarIcon: ({ color }) => (
-            <IconSymbol name="home" size={35} color={color} />
+            <IconSymbol name="cart-shop" size={35} color={color} />
           ),
           
         }}

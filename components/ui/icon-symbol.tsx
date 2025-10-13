@@ -1,14 +1,14 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChartSimple, faCartShopping, faUser, faPlus, faUserPen, faLock, faEnvelope, faTrash
-  , faFilePen, faClockRotateLeft
+  , faFilePen, faClockRotateLeft, faAngleLeft, faAngleRight, faDollarSign, faChartLine, faBoxOpen
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { OpaqueColorValue, StyleProp, TextStyle } from "react-native";
 
 const NEW_ICONS: Record<string, IconDefinition> = {
   "chart-simple": faChartSimple,
-  "home": faCartShopping,
+  "cart-shop": faCartShopping,
   "user": faUser,
   "plus": faPlus,
   "userPen": faUserPen,
@@ -16,7 +16,12 @@ const NEW_ICONS: Record<string, IconDefinition> = {
   "email": faEnvelope,
   "delete": faTrash,
   "filePen": faFilePen,
-  "clock" : faClockRotateLeft
+  "clock" : faClockRotateLeft,
+  "angle-left": faAngleLeft, 
+  "angle-right": faAngleRight, 
+  "dolar": faDollarSign,
+  "chart-line" : faChartLine, 
+  "box-open" : faBoxOpen
   // Adicione mais ícones aqui conforme precisar
 };
 

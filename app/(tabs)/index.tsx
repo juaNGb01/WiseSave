@@ -28,14 +28,14 @@ export default function Index() {
     <View style={styles.container}>
 
 
-      <View style = {styles.sectionButtons}>
+      <View >
         <SectionButton icon="filePen" text="Sua lista de compras" backgroundColor= "rgba(56, 202, 88, 1)"/>
         <SectionButton icon="clock" text ="Histórico de compras" backgroundColor="rgba(122, 49, 187, 1)" />
-        <SectionButton icon="clock" text ="Histórico de compras" backgroundColor="rgba(122, 49, 187, 1)" />
+        <SectionButton icon="chart-line" text ="Resumo Mensal" backgroundColor="rgba(26, 130, 227, 1)" />
       </View>
      
 
-      {/* NOVO: Botão flutuante para navegar para a tela de adicionar lista */}
+      {/* Botão flutuante para navegar para a tela de adicionar lista */}
       <Pressable
         style={styles.floatingButton}
         onPress={() => router.push("/(tabs)/shopList")} // Ação de navegar
@@ -53,14 +53,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     paddingTop: 50,
   },
-  sectionButtons : {
-    
 
 
-  },
 
-
-  // NOVO: Estilos para o botão flutuante
   floatingButton: {
     position: "absolute",
     width: 60,
@@ -69,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#38CA58",
     justifyContent: "center",
     alignItems: "center",
-    bottom: "15%",
+    bottom: 50,
     right: 30,
     elevation: 8,
     shadowColor: "#000",

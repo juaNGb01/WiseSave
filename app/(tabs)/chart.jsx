@@ -2,11 +2,15 @@ import {
   View,
   Text,
   StyleSheet,
+  Pressable,
+  ScrollView,
 } from "react-native";
 import React from "react";
 import { BarChart } from 'react-native-gifted-charts';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import InfoCardItem from "@/components/ui/infoCardItem";
 
-// 1. Definição dos dados
+// 1. Definição dos dadosww
 const barData = [
   { value: 10, label: 'Jan' },
   { value: 65, label: 'Fev' },
@@ -15,12 +19,47 @@ const barData = [
 ];
 
 
+const cardsData = [
+  {
+    id: "1",
+    title: "Total comprado",
+    value: "1000.60",
+    description: "total comprado no mês",
+    icon: "dolar"
+  },
 
+  {
+    id: "2",
+    title: "Maior Compra",
+    value: "250",
+    description: "Valor unico mais alto",
+    icon: "chart-line"
+  },
+
+  {
+    id: "3",
+    title: "Produo mais caro",
+    value: "32",
+    description: "Carne Bovina",
+    icon: "box-open"
+  },
+
+  {
+    id: "4",
+    title: "Mais comprado",
+    value: "Pão Francês",
+    description: "produto em maior quantidade",
+    icon: "cart-shop"
+  },
+
+
+]
 
 const Chart = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gastos Mensais (Exemplo)</Text>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+
+      <Text style={styles.title}>Gastos Mensais </Text>
 
       <BarChart
         data={barData}
@@ -38,14 +77,15 @@ const Chart = () => {
         // arraedonda a barra
         barBorderRadius={8}
 
-       
+
 
         yAxisThickness={0} //exibe ou não os eixos do grafico(y)
         xAxisThickness={0} //exibe ou não os eixos do grafico(x)
         xAxisColor="#054a42ff" //cor do eixo 
-        rulesColor = "#dadadaff"
+        rulesColor="#dadadaff"
+
         // rulesType="solid"
-        noOfSections={3} //indica quantas "partes" tem o grafico
+        noOfSections={3} //indica quantas secoes tem o grafico
 
         //config de uma linha para refencia(a media geral do valores)
         showReferenceLine1
@@ -54,39 +94,82 @@ const Chart = () => {
           color: '#000000ff',
           dashWidth: 2,
           dashGap: 3,
-          
-        }}
 
+        }
+        }
 
       />
-    </View>
+
+
+      {/*Botão fds*/}
+      <View style={styles.buttonSelectMonth}>
+        <Pressable onPress={() => { console.log("volta mes") }}>
+          <IconSymbol name="angle-left" size={20}></IconSymbol>
+        </Pressable>
+        <Text>nome mes</Text>
+        <Pressable onPress={() => { console.log("avança mes") }}>
+          <IconSymbol name="angle-right" size={20}></IconSymbol>
+        </Pressable>
+      </View>
+
+
+      <View style={styles.cardsWrapper}>
+        {cardsData.map((item) => (
+          <InfoCardItem key={item.id} item={item} />
+        ))}
+      </View>
+
+
+
+
+    </ScrollView>
+
+
+
+
+
   );
 
 }
 const styles = StyleSheet.create({
-  container: {
+  chartContainer: {
     padding: 20,
-    //backgroundColor: '#293d3a89', // Cor de fundo do container
     borderRadius: 10,
     shadowColor: '#000000ff',
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 8,
-    marginVertical: 20,
-    alignItems: 'center', 
-    margin: 10, 
-
-    
-
+    alignItems: 'center',
+    flex: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
     color: '#333',
   },
+  buttonSelectMonth: {
+    flexDirection: "row",
+    marginVertical: 30,
+    alignItems: 'center',
+    gap: 20,
+  },
+
+  scrollContent: {
+    padding: 20, // Aplica o padding geral da tela
+    alignItems: 'center', // Centraliza o BarChart e outros elementos
+    flexGrow: 1, // Permite que o ScrollView cresça
+  },
+
+  cardsWrapper: {
+    width: '100%',
+    marginTop: 20,
+  },
+
+
 });
 
 
 export default Chart;
+

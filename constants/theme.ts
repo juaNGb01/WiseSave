@@ -39,12 +39,12 @@ export const tabBarScreenOptions = {
     height: 70,  
     //width: "90%",
 
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    // position: "absolute",
+    // bottom: 20,
+    // left: 20,
+    // right: 20,
 
-    borderRadius: 50,
+    // borderRadius: 50,
 
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
