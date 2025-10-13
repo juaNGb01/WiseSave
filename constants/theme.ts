@@ -37,6 +37,7 @@ export const tabBarScreenOptions = {
   tabBarStyle: {
     backgroundColor: "#38CA58",
     height: 70,  
+    //width: "90%",
 
     position: "absolute",
     bottom: 20,

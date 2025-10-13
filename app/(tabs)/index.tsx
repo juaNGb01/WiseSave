@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+//import React, { useState } from "react";
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ export default function Index() {
 
       <View style = {styles.sectionButtons}>
         <SectionButton icon="filePen" text="Sua lista de compras" backgroundColor= "rgba(56, 202, 88, 1)"/>
+        <SectionButton icon="clock" text ="Histórico de compras" backgroundColor="rgba(122, 49, 187, 1)" />
         <SectionButton icon="clock" text ="Histórico de compras" backgroundColor="rgba(122, 49, 187, 1)" />
       </View>
      
@@ -79,7 +80,6 @@ const styles = StyleSheet.create({
   floatingButtonText: {
     color: "#FFF",
     fontSize: 30,
-    fontWeight: "bold",
-    lineHeight: 32, // Ajuste fino para centralizar o '+'
+    fontWeight: "bold"
   },
 });
