@@ -12,21 +12,13 @@ import { useRouter } from "expo-router"; // NOVO: Importamos o useRouter para na
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import SectionButton from "@/components/homeScreen/sectionButton";
 
-// A estrutura do item continua a mesma
-interface Item {
-  id: string;
-  name: string;
-  completed: boolean;
-  quantity: number;
-}
 
 export default function Index() {
-  const router = useRouter(); // NOVO: Inicializamos o router
-
+  const router = useRouter(); 
+  
   // --- RENDERIZAÇÃO DO COMPONENTE ---
   return (
     <View style={styles.container}>
-
 
       <View >
         <SectionButton icon="filePen" text="Sua lista de compras" backgroundColor= "rgba(56, 202, 88, 1)"/>
@@ -38,7 +30,7 @@ export default function Index() {
       {/* Botão flutuante para navegar para a tela de adicionar lista */}
       <Pressable
         style={styles.floatingButton}
-        onPress={() => router.push("/(tabs)/shopList")} // Ação de navegar
+        onPress={() => router.push("/(tabs)/shopList")}
       >
         <IconSymbol name="plus" size={30} color="white"></IconSymbol>
       </Pressable>
@@ -46,7 +38,6 @@ export default function Index() {
   );
 }
 
-// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,

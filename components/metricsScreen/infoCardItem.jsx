@@ -1,5 +1,5 @@
-import { StyleSheet, View, Text} from "react-native";
-import { IconSymbol } from "./icon-symbol";
+import { StyleSheet, Text, View } from "react-native";
+import { IconSymbol } from "../ui/icon-symbol";
 
 export default function InfoCardItem({ item }) {
     
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     alignContent: "center",
 
 
-    //justifyContent: "center"
   },
 
   iconPosition: {
@@ -81,8 +80,6 @@ const styles = StyleSheet.create({
   },
 
   infoCardText: {
-    // borderWidth: 1,
-    // borderColor: "black",
     justifyContent: "space-between"
 
   },
@@ -93,7 +90,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
     marginBottom: 4,
-    //textAlign: 'center',
+
 
   },
 
@@ -101,7 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     color: '#333',
-    //textAlign: 'center',
+
   },
 
   infoValueProduct: {
@@ -109,19 +106,8 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 8,
     marginBottom: 4,
-    //textAlign: 'center',
-  },
 
-  // infoCard: {
-  //   backgroundColor: '#fff',
-  //   borderRadius: 12,
-  //   padding: 20,
-  //   shadowColor: '#000',
-  //   shadowOffset: { width: 0, height: 2 },
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  // },
+  },
 
 
 });

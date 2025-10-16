@@ -1,14 +1,14 @@
+import InfoCardItem from "@/components/metricsScreen/infoCardItem";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import React from "react";
 import { BarChart } from 'react-native-gifted-charts';
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import InfoCardItem from "@/components/ui/infoCardItem";
 
 // 1. Definição dos dadosww
 const barData = [
