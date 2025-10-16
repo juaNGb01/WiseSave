@@ -69,7 +69,7 @@ const Chart = () => {
         //posicao do grafico
         initialSpacing={1}
         endSpacing={10}
-        yAxisLabelWidth={90}
+        yAxisLabelWidth={70}
 
         spacing={20}
         frontColor="#17ceceff"
@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
+    marginVertical: 20,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
