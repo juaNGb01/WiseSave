@@ -13,12 +13,6 @@ import {
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 
-interface TempItem {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-}
 
 export default function ShopListScreen() {
   const router = useRouter();
@@ -26,7 +20,7 @@ export default function ShopListScreen() {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState("un");
-  const [tempItems, setTempItems] = useState<TempItem[]>([]);
+  const [tempItems, setTempItems] = useState([]); 
 
   const handleAddItemToList = () => {
     if (itemName.trim() === "") {
@@ -36,7 +30,7 @@ export default function ShopListScreen() {
     const numQuantity = parseFloat(quantity.replace(",", ".")) || 1;
     const itemUnit = unit.trim() || "un";
 
-    const newItem: TempItem = {
+    const newItem = { 
       id: Date.now().toString(),
       name: itemName.trim(),
       quantity: numQuantity,
@@ -50,7 +44,7 @@ export default function ShopListScreen() {
     Keyboard.dismiss();
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = (id) => { 
     setTempItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
@@ -107,7 +101,7 @@ export default function ShopListScreen() {
         </View>
       </View>
 
-      <Text style={styles.subHeader}>Itens a adicionar:</Text>
+      <Text style={styles.subHeader}>Itens adicionados:</Text>
 
       {/* --- LISTA --- */}
       <FlatList
