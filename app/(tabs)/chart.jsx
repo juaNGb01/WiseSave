@@ -132,6 +132,15 @@ const Chart = () => {
 
 }
 const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 20, 
+    alignItems: 'center', 
+    flexGrow: 1, // Permite que o ScrollView cresça
+    backgroundColor: "white", 
+    
+
+  },
+
   chartContainer: {
     padding: 20,
     borderRadius: 10,
@@ -154,12 +163,6 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     alignItems: 'center',
     gap: 20,
-  },
-
-  scrollContent: {
-    padding: 20, // Aplica o padding geral da tela
-    alignItems: 'center', // Centraliza o BarChart e outros elementos
-    flexGrow: 1, // Permite que o ScrollView cresça
   },
 
   cardsWrapper: {
