@@ -69,7 +69,7 @@ const Chart = () => {
         //posicao do grafico
         initialSpacing={1}
         endSpacing={10}
-        yAxisLabelWidth={90}
+        yAxisLabelWidth={70}
 
         spacing={20}
         frontColor="#17ceceff"
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
+    marginVertical: 50
   },
   buttonSelectMonth: {
     flexDirection: "row",

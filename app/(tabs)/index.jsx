@@ -16,7 +16,7 @@ import SectionButton from "@/components/homeScreen/sectionButton";
 export default function Index() {
   const router = useRouter(); 
   
-  // --- RENDERIZAÇÃO DO COMPONENTE ---
+
   return (
     <View style={styles.container}>
 
@@ -27,7 +27,7 @@ export default function Index() {
       </View>
      
 
-      {/* Botão flutuante para navegar para a tela de adicionar lista */}
+
       <Pressable
         style={styles.floatingButton}
         onPress={() => router.push("/(tabs)/shopList")}

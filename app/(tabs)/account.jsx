@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 2
+    marginBottom: 2,
+    //marginVertical: 20
   },
 
   headerSubTitle: {
