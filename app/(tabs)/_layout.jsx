@@ -18,7 +18,7 @@ export default function TabLayout() {
       screenOptions={tabBarScreenOptions}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: "Minha Lista",
           // PASSO 2: USAR O ÍCONE AQUI

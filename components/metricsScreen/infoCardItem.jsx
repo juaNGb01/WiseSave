@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
 
   iconPosition: {
     position: "absolute",
-    left: 270,
+    left: "85%",
     top: 20
 
   },

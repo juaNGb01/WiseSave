@@ -10,13 +10,7 @@ import {
 } from "react-native";
 import { BarChart } from 'react-native-gifted-charts';
 
-// 1. Definição dos dadosww
-const barData = [
-  { value: 10, label: 'Jan' },
-  { value: 65, label: 'Fev' },
-  { value: 50, label: 'Mar' },
-  { value: 75, label: 'Abr' },
-];
+
 
 
 const cardsData = [
@@ -52,8 +46,15 @@ const cardsData = [
     icon: "cart-shop"
   },
 
-
 ]
+
+// 1. Definição dos dadosww
+const barData = [
+  { value: 10, label: 'Jan' },
+  { value: 65, label: 'Fev' },
+  { value: 50, label: 'Mar' },
+  { value: 75, label: 'Abr' },
+];
 
 const Chart = () => {
   return (
@@ -101,7 +102,7 @@ const Chart = () => {
       />
 
 
-      {/*Botão fds*/}
+
       <View style={styles.buttonSelectMonth}>
         <Pressable onPress={() => { console.log("volta mes") }}>
           <IconSymbol name="angle-left" size={20}></IconSymbol>
@@ -133,11 +134,11 @@ const Chart = () => {
 }
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: 20, 
-    alignItems: 'center', 
+    padding: 20,
+    alignItems: 'center',
     flexGrow: 1, // Permite que o ScrollView cresça
-    backgroundColor: "white", 
-    
+    backgroundColor: "white",
+
 
   },
 
