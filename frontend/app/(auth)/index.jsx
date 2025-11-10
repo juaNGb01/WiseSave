@@ -8,25 +8,57 @@ import {
   Alert,
   Image,
   Pressable,
-  
+
 } from "react-native";
 import { router } from "expo-router";
+import axios from 'axios';
+
+//alterar ip para o da maquina
+const API_BASE_URL = 'http://192.168.3.56:3000/wisesave/auth'
 
 export default function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
+
+  const handleLogin = async () => {
+
+
     if (!email || !password) {
-      Alert.alert("Erro", "Preencha todos os campos");
+      Alert.alert("Prencha todos os campos!");
       return;
+    };
+
+    setLoading(true)
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
+        email,
+        password
+      })
+
+      const userData = response.data;
+      Alert.alert(
+        "Sucesso!",
+        response.data.message,
+        [
+          // Após o sucesso, leva o usuário para a tela de Login
+          { text: "OK", onPress: () => router.replace("/(tabs)/home") }
+        ]
+      )
+
+
+
+    } catch (error) {
+      //retorna o status 401 ou 400
+      const errorMessage = error.response?.data?.message || "Erro de conexão ou credenciais inválidas.";
+      console.log(error)
+      Alert.alert("Falha no Login", errorMessage);
+    } finally {
+      setLoading(false);
     }
-    // No futuro, aqui vai a lógica de verdade
-    Alert.alert("Login", "Login feito com sucesso!");
-    // Linha importante para navegar para a tela principal
-    router.replace("/(tabs)/home");
-  };
+  }
 
   return (
 
@@ -38,13 +70,23 @@ export default function LoginScreen() {
       />
 
       <View style={styles.inputContainer}>
-   
+
         <Text style={styles.inputLabel}>Email</Text>
-        <TextInput placeholder="Digite seu email" style={styles.input} keyboardType="email-address" />
+        <TextInput
+          placeholder="Digite seu email"
+          style={styles.input}
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail} />
 
 
         <Text style={styles.inputLabel}>Senha</Text>
-        <TextInput placeholder="Digite sua senha" style={styles.input} secureTextEntry />
+        <TextInput
+          placeholder="Digite sua senha"
+          style={styles.input}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword} />
 
         <Text style={styles.forgotPasswordText}>esqueceu a senha?</Text>
       </View>
@@ -52,14 +94,16 @@ export default function LoginScreen() {
       <View style={styles.btnCotainer}>
 
         <Pressable style={styles.buttonPrimary}
+          onPress={handleLogin}
+          disabled={loading}
         >
           <Text style={styles.buttonPrimaryText}>Login</Text>
         </Pressable>
 
         <Pressable style={styles.buttonSecondary}
-             onPress={()=>{
+          onPress={() => {
             router.push("register");
-          }} 
+          }}
         >
           <Text style={styles.buttonSecondaryText}>Cadastrar</Text>
         </Pressable>
@@ -70,22 +114,23 @@ export default function LoginScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   // CONTAINER PRINCIPAL
   formContiner: {
-    flex: 1, // ✅ Essencial: Ocupa a tela toda
-    backgroundColor: '#ffffffff', // Fundo claro e moderno
-    alignItems: 'center', // Centraliza o logo e o inputContainer horizontalmente
-    paddingHorizontal: 30, // Espaçamento lateral da tela
-    paddingTop: 80, // Espaço do topo (onde o header estaria)
-    justifyContent: 'flex-start', // Começa o conteúdo do topo
+    flex: 1,
+    backgroundColor: '#ffffffff',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+    paddingTop: 80,
+    justifyContent: 'flex-start',
   },
 
   // ESTILO DO LOGO
   imgLogo: {
     width: 150,
     height: 150,
-    marginBottom: 40, // Espaço entre o logo e o primeiro input
+    marginBottom: 40,
     resizeMode: 'contain',
   },
 
@@ -110,11 +155,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: 'white',
-    borderRadius: 10, // Bordas suaves
+    borderRadius: 10,
     paddingHorizontal: 15,
-    fontSize: 16, 
+    fontSize: 16,
     borderWidth: 1,
-    borderColor: 'rgba(56, 202, 88, 1)', // Borda sutil
+    borderColor: 'rgba(56, 202, 88, 1)',
     marginBottom: 10,
     color: "rgba(113, 113, 113, 0.63)"
   },
@@ -122,30 +167,26 @@ const styles = StyleSheet.create({
   // TEXTO DE ESQUECEU A SENHA
   forgotPasswordText: {
     fontSize: 14,
-    color: 'rgba(39, 150, 63, 1)', // Cor de link
+    color: 'rgba(39, 150, 63, 1)',
     fontWeight: '600',
-    textAlign: 'right', // Alinha à direita
+    textAlign: 'right',
     marginTop: 5,
   },
 
   // CONTAINER DOS BOTÕES
   btnCotainer: {
     width: '100%',
-    // FlexDirection: 'row' para colocar os botões lado a lado,
-    // ou deixamos como coluna (padrão) para botões empilhados (mais comum em mobile).
-    // Aqui usaremos botões empilhados (coluna).
-    gap: 15, // Espaço entre os botões
+    gap: 15,
   },
-
   // ESTILO DO BOTÃO PRINCIPAL (Login)
   buttonPrimary: {
     width: '100%',
     height: 50,
-    backgroundColor: 'rgba(56, 202, 88, 1)', // Azul vibrante
+    backgroundColor: 'rgba(56, 202, 88, 1)',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    // Sombra sutil
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -158,21 +199,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  // ESTILO DO BOTÃO SECUNDÁRIO (Cadastrar)
+  // ESTILO DO BOTÃO SECUNDÁRIO 
   buttonSecondary: {
     width: '100%',
     height: 50,
-    backgroundColor: 'transparent', // Fundo transparente
+    backgroundColor: 'transparent',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(56, 202, 88, 1)', // A cor de borda do primário
+    borderColor: 'rgba(56, 202, 88, 1)',
   },
   buttonSecondaryText: {
-    color: 'rgba(56, 202, 88, 1)', // A cor do texto é a primária
+    color: 'rgba(56, 202, 88, 1)',
     fontSize: 18,
     fontWeight: 'bold',
-  },
+  }
 
 });
+

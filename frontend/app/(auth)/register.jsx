@@ -6,37 +6,59 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  ScrollView, // Usado aqui para garantir que a tela role se houver muitos campos
+  ScrollView,
+  Pressable,
 } from "react-native";
+import axios from "axios";
 import { router } from "expo-router";
 
+//configurar conforme o ip local
+const API_BASE_URL = 'http://192.168.3.56:3000/wisesave/auth';
+
 export default function RegisterScreen() {
-  const [name, setName] = useState("");
+
+
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert("Erro", "Preencha todos os campos.");
+  const handleRegister = async () => {
+
+
+    if (!userName || !email || !password || !confirmPassword) {
+      Alert.alert("Erro", "preencha todos os campos");
       return;
     }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Erro", "As senhas não coincidem.");
-      return;
+      if (password !== confirmPassword) {
+        Alert.alert("Erro", "As senhas não coincidem.");
+        console.log("senha")
+        return;
+      }
+      setLoading(true)
+      try {
+        const response = await axios.post(`${API_BASE_URL}/register`, {
+          userName,
+          email,
+          password
+        })
+        Alert.alert(
+          "Sucesso!",
+          response.data.message || "Cadastro realizado com sucesso!",
+          [
+            // Após o sucesso, leva o usuário para a tela de Login
+            { text: "OK", onPress: () => router.replace("/(auth)") }
+          ]
+        )
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Erro de conexão. Tente novamente.";
+        Alert.alert("Falha no Cadastro", errorMessage);
+      } finally {
+        setLoading(false);
+      };
     }
-
-    // Lógica de cadastro (chamar API) iria aqui
-    
-    Alert.alert("Sucesso", "Cadastro realizado! Faça login para continuar.");
-    
-    // ✅ NOVO: Navega para a tela de Login (que é a rota index do grupo (auth))
-    // Usamos 'replace' para não deixar o usuário voltar para o cadastro
-    router.replace("index"); 
-  };
-
-
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -48,8 +70,8 @@ export default function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Seu nome"
-          value={name}
-          onChangeText={setName}
+          value={userName}
+          onChangeText={setUserName}
           autoCapitalize="words"
         />
 
@@ -85,15 +107,15 @@ export default function RegisterScreen() {
         />
 
         {/* BOTÃO PRIMÁRIO (Cadastrar) */}
-        <TouchableOpacity style={styles.buttonPrimary} onPress={handleRegister}>
+        <Pressable style={styles.buttonPrimary} onPress={handleRegister} disabled={loading}>
           <Text style={styles.buttonPrimaryText}>Cadastrar</Text>
-        </TouchableOpacity>
-        
+        </Pressable>
+
         {/* LINK PARA LOGIN */}
-        <TouchableOpacity style={styles.linkContainer} onPress={()=> router.back()}>
-            <Text style={styles.linkText}>Já tem conta? <Text style={{fontWeight: 'bold'}}>Faça Login</Text></Text>
-        </TouchableOpacity>
-        
+        <Pressable style={styles.linkContainer} onPress={() => router.back()}>
+          <Text style={styles.linkText}>Já tem conta? <Text style={{ fontWeight: 'bold' }}>Faça Login</Text></Text>
+        </Pressable>
+
       </View>
     </ScrollView>
   );
@@ -105,24 +127,24 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1, // Permite que o conteúdo se expanda e role
     justifyContent: "center", // Centraliza o formulário verticalmente
-    backgroundColor: '#F7F7F7', 
-    paddingHorizontal: 30, 
+    backgroundColor: '#F7F7F7',
+    paddingHorizontal: 30,
     paddingVertical: 50,
   },
-  
+
   // CONTAINER DO FORMULÁRIO (Usado para aplicar margens em bloco)
   formContainer: {
     width: '100%',
     alignItems: 'center',
   },
-  
-  title: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
     marginBottom: 40,
     color: '#333333',
   },
-  
+
   // RÓTULOS (Nome, Email, etc.)
   inputLabel: {
     width: "100%",
@@ -150,19 +172,19 @@ const styles = StyleSheet.create({
   buttonPrimary: {
     width: "100%",
     height: 50,
-    backgroundColor: '#3498DB', 
+    backgroundColor: '#3498DB',
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
     marginBottom: 15,
   },
-  buttonPrimaryText: { 
-    color: "white", 
-    fontSize: 18, 
-    fontWeight: "bold" 
+  buttonPrimaryText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold"
   },
-  
+
   // LINK PARA LOGIN
   linkContainer: {
     marginTop: 10,
