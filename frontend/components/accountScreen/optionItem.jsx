@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { IconSymbol } from "../ui/icon-symbol";
 
 
-export default function OptionItem({iconName, text, bgIcon} ) {
+export default function OptionItem({iconName, text, bgIcon, onPress} ) {
 
     //bgcolor do icon
     const backgroundColor = bgIcon === "default" ? "rgba(56, 202, 88, 1)" : "rgba(255, 0, 0, 0.74)"
     const color = bgIcon === "default" ? "grey" : "rgba(255, 0, 0, 0.74)"
 
     return (
-        <Pressable style={styles.optionItem}>
+        <Pressable style={styles.optionItem} onPress={onPress}>
             {/*icon option*/}
             <View style={[styles.optionItemIcon, {backgroundColor} ]} >
                 <IconSymbol name={iconName} size={15} color="white"></IconSymbol>

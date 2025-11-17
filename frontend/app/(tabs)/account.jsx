@@ -6,19 +6,144 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import OptionItem from "@/components/accountScreen/optionItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+//import { AccountSettingsDialog } from '@/components/accountScreen/accountSettingsDialog';
+import { router } from "expo-router";
 
-
-
-
-const UserHandle = async ()=> {
-
-}
 
 const account = () => {
+
+  const [user, setUser] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+
+  //carregar os dados do usuário logo ao acessar a tela
+  useEffect(() => {
+    loadUser();
+  }, []);
+  //carregar usuário
+  const loadUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      console.log("📦 Dados brutos do AsyncStorage:", userData); // Ver o que tem salvo
+
+      if (userData) {
+
+        setUser(JSON.parse(userData));
+
+      }
+    } catch (error) {
+      console.error("Erro ao carregar usuário:", error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      // REMOVER TOKEN E DADOS DO ASYNCSTORAGE
+      await AsyncStorage.multiRemove(["token", "user"]);
+
+      // Opcional: Mostrar mensagem
+      Alert.alert("Sucesso", "Você saiu da conta!");
+      // Redirecionar para login
+      router.dismissAll(); // Fecha todas as telas
+      router.replace("/");
+
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      Alert.alert("Erro", "Não foi possível sair");
+    }
+  }
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair",
+      "Tem certeza que deseja sair?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Sair",
+          style: "destructive",
+          onPress: () => { logout() }
+        }
+      ]
+    )
+
+  }
+
+  const handleDeleteAccount = () => {
+
+    Alert.alert(
+      "Sair",
+      "Tem certeza que deseja deletar a conta?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: () => { deleteAccount() }
+        }
+      ]
+    )
+  }
+
+
+  const deleteAccount = async () => {
+    try {
+      // Pegar o token
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert("Erro", "Você não está autenticado");
+        return;
+      }
+
+      // Fazer requisição para deletar
+      await axios.delete(
+        "http://10.204.25.138:3000/wisesave/user/delete",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      // Limpar AsyncStorage
+      await AsyncStorage.multiRemove(["token", "user"]);
+
+      // Redirecionar para login
+      Alert.alert("Sucesso", "Conta deletada com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => {
+            router.dismissAll();
+            router.replace("/");
+          }
+        }
+      ]);
+
+    } catch (error) {
+      console.error("Erro ao deletar conta:", error);
+      Alert.alert(
+        "Erro",
+        error.response?.data?.message || "Não foi possível deletar a conta"
+      );
+    }
+  }
+
+
+
   return (
 
     <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -40,8 +165,8 @@ const account = () => {
         </View>
         {/*user data*/}
         <View style={styles.userDataText}>
-          <Text style={styles.userDataName}>username</Text>
-          <Text style={styles.userDataEmail}>user@email.com</Text>
+          <Text style={styles.userDataName}>{user?.name || "Usuário"}</Text>
+          <Text style={styles.userDataEmail}>{user?.email || ""}</Text>
         </View>
       </View>
 
@@ -50,6 +175,8 @@ const account = () => {
       <View style={styles.optionsContainer}>
         <OptionItem iconName="user" text="Alterar nome usuário" bgIcon="default" />
         <OptionItem iconName="email" text="Alterar email" bgIcon="default" />
+
+
       </View>
 
       <View style={styles.optionsContainer}>
@@ -57,16 +184,19 @@ const account = () => {
         <OptionItem iconName="moon" text="Modo noturno" bgIcon="default" />
       </View>
 
-      
+
       <View style={styles.optionsContainer}>
-        <OptionItem iconName="delete" text="Deletar conta" bgIcon="danger" />
-         <OptionItem iconName="logout" text="Sair da Conta" bgIcon="danger" />
+        <OptionItem iconName="delete" text="Deletar conta" bgIcon="danger" onPress={handleDeleteAccount} />
+        <OptionItem iconName="logout" text="Sair da Conta" bgIcon="danger" onPress={handleLogout} />
       </View>
+
+
 
     </ScrollView>
 
   );
-};
+}
+
 
 const styles = StyleSheet.create({
 
@@ -148,7 +278,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     backgroundColor: "white",
     width: "90%",
-    
+
     borderRadius: 20,
     padding: 15,
 

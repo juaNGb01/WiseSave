@@ -2,8 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 //import User from "../models/user"
-import authRoutes from "./src/routes/auth.js"
+import authRoutes from "./src/routes/authRoutes.js"
 import listRoutes from "./src/routes/listRoutes.js";
+import userRoutes from "./src/routes/userRoutes.js"
 
 dotenv.config();
 
@@ -26,22 +27,20 @@ connectdb();
 
 app.use(express.json()); 
 
-app.get('/test', (req, res) => {
+app.get('/wisesave', (req, res) => {
     res.status(200).send("Teste de Roteamento Simples OK.");
 });
 
 //trata as autenticações login + cadastro
 app.use("/wisesave/auth", authRoutes);
-
+app.use("/api/lists", listRoutes); 
+app.use("/wisesave/user", userRoutes);
 
 
 
 app.listen(port, () => {
     console.log("Servidor rodando na porta " + port);
 })
-// ... outro código ...
-app.use("/api/auth", authRoutes);
 
-// ▼▼▼ ADICIONE ESTA LINHA AQUI ▼▼▼
-app.use("/api/lists", listRoutes); // 2. FALA PARA O APP USAR A NOVA RUTA
-// ... resto do código ...
+//app.use("/api/auth", authRoutes);
+

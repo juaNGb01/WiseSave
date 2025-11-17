@@ -59,7 +59,7 @@ const handleFinish = async () => { // Adicionamos 'async' aqui
 
   // 2. Definir o endereço do backend
   // !!! TROQUE O IP E A PORTA PELOS SEUS !!!
-  const API_URL = 'http://10.204.25.138:3000/api/lists';
+  const API_URL = 'http://10.204.25.138:3000/wisesave/lists';
 
   try {
     // 3. Fazer a "ligação" (fetch)

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   Image,
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //alterar ip para o da maquina
 const API_BASE_URL = "http://10.204.25.138:3000/wisesave/auth";
@@ -22,7 +22,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Prencha todos os campos!");
+      Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
 
@@ -33,17 +33,41 @@ export default function LoginScreen() {
         password,
       });
 
-      const userData = response.data;
-      Alert.alert("Sucesso!", response.data.message, [
-        // Após o sucesso, leva o usuário para a tela de Login
-        { text: "OK", onPress: () => router.replace("/(tabs)/home") },
+      console.log("Resposta completa:", response.data);
+
+      const { token, message, id, name, email: userEmail } = response.data;
+      
+      // console.log("Token:", token);
+      // console.log("ID:", id);
+      // console.log("Name:", name);
+      // console.log("Email:", userEmail);
+
+      if (token && id) {
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("user", JSON.stringify({
+          id: id,
+          name: name,
+          email: userEmail
+        }));
+        
+        console.log("dados salvos no asyncStorage");
+      }
+
+      Alert.alert("Sucesso!", message, [
+        {
+          text: "OK",
+          onPress: () => {
+            setEmail("");
+            setPassword("");
+            router.replace("/(tabs)/home");
+          }
+        },
       ]);
     } catch (error) {
-      //retorna o status 401 ou 400
       const errorMessage =
         error.response?.data?.message ||
         "Erro de conexão ou credenciais inválidas.";
-      console.log(error);
+      console.error("Erro no login:", error);
       Alert.alert("Falha no Login", errorMessage);
     } finally {
       setLoading(false);
@@ -63,6 +87,7 @@ export default function LoginScreen() {
           placeholder="Digite seu email"
           style={styles.input}
           keyboardType="email-address"
+          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
         />
@@ -72,6 +97,7 @@ export default function LoginScreen() {
           placeholder="Digite sua senha"
           style={styles.input}
           secureTextEntry
+          autoCapitalize="none"
           value={password}
           onChangeText={setPassword}
         />
@@ -81,18 +107,19 @@ export default function LoginScreen() {
 
       <View style={styles.btnCotainer}>
         <Pressable
-          style={styles.buttonPrimary}
+          style={[styles.buttonPrimary, loading && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.buttonPrimaryText}>Login</Text>
+          <Text style={styles.buttonPrimaryText}>
+            {loading ? "Entrando..." : "Login"}
+          </Text>
         </Pressable>
 
         <Pressable
           style={styles.buttonSecondary}
-          onPress={() => {
-            router.push("register");
-          }}
+          onPress={() => router.push("register")}
+          disabled={loading}
         >
           <Text style={styles.buttonSecondaryText}>Cadastrar</Text>
         </Pressable>
@@ -102,7 +129,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  // CONTAINER PRINCIPAL
   formContiner: {
     flex: 1,
     backgroundColor: "#ffffffff",
@@ -111,22 +137,16 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     justifyContent: "flex-start",
   },
-
-  // ESTILO DO LOGO
   imgLogo: {
     width: 150,
     height: 150,
     marginBottom: 40,
     resizeMode: "contain",
   },
-
-  // CONTAINER DE INPUTS E TEXTOS DE SUPORTE
   inputContainer: {
     width: "100%",
     marginBottom: 30,
   },
-
-  // RÓTULOS (Email/Senha)
   inputLabel: {
     fontSize: 16,
     fontWeight: "600",
@@ -134,8 +154,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginLeft: 5,
   },
-
-  // CAIXAS DE INPUT
   input: {
     width: "100%",
     height: 50,
@@ -146,10 +164,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(56, 202, 88, 1)",
     marginBottom: 10,
-    color: "rgba(113, 113, 113, 0.63)",
+    color: "#333333",
   },
-
-  // TEXTO DE ESQUECEU A SENHA
   forgotPasswordText: {
     fontSize: 14,
     color: "rgba(39, 150, 63, 1)",
@@ -157,13 +173,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
     marginTop: 5,
   },
-
-  // CONTAINER DOS BOTÕES
   btnCotainer: {
     width: "100%",
     gap: 15,
   },
-  // ESTILO DO BOTÃO PRINCIPAL (Login)
   buttonPrimary: {
     width: "100%",
     height: 50,
@@ -171,7 +184,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -183,8 +195,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-
-  // ESTILO DO BOTÃO SECUNDÁRIO
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   buttonSecondary: {
     width: "100%",
     height: 50,
