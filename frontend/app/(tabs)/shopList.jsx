@@ -18,6 +18,7 @@ import { Picker } from "@react-native-picker/picker";
 export default function ShopListScreen() {
   const router = useRouter();
 
+  const [listName, setListName] = useState("");
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState("un");
@@ -52,12 +53,18 @@ export default function ShopListScreen() {
   // O NOVO handleFinish, com a "ligação" para o backend
   const handleFinish = async () => { // Adicionamos 'async' aqui
 
+     if (listName === "" ) {
+      Alert.alert("Erro", "Adicione um nome a sua lista.");
+      return;
+    }
+
     // 1. Validação (ver se o usuário adicionou itens)
     if (tempItems.length === 0) {
       Alert.alert("Erro", "Adicione pelo menos um item à lista.");
       return;
     }
 
+   
     // 2. Definir o endereço do backend
     const API_LIST_URL = `${API_URL}/wisesave/lists/`;
 
@@ -70,7 +77,7 @@ export default function ShopListScreen() {
         },
         // 4. Envia os dados no formato que o backend espera
         body: JSON.stringify({
-          name: "Minha Lista de Teste", // Vamos arrumar isso depois
+          name: listName, // Vamos arrumar isso depois
           items: tempItems
         })
       });
@@ -95,6 +102,12 @@ export default function ShopListScreen() {
 
       {/* --- FORMULÁRIO --- */}
       <View style={styles.formContainer}>
+          <TextInput
+          style={styles.input}
+          placeholder="Nome da lista"
+          value={listName}
+          onChangeText={setListName}
+        />
         <TextInput
           style={styles.input}
           placeholder="Nome do Produto"
@@ -201,6 +214,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: "#E0E0E0",
+    marginBottom: 5,
+    
   },
   inputQuantity: {
     flex: 1,
