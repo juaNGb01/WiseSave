@@ -1,17 +1,16 @@
 // routes/listRoutes.js
 import express from 'express';
 
-// Importa TODAS as funções da "cozinha"
-// Preste atenção nas maiúsculas: 'createList'
 import {
-  createList, // <--- O 'L' AQUI É MAIÚSCULO
+  createList, 
   getAllLists,
   getListById,
   deleteList,
-  toggleItemCompleted
+  toggleItemCompleted, 
+  updateItemInList
+  
 } from '../controllers/listController.js';
 
-// Cria o roteador
 const router = express.Router();
 
 
@@ -23,9 +22,11 @@ router.post('/', createList);
 router.get('/:id', getListById);
 router.delete('/:id', deleteList);
 
-// Define a rota para ATUALIZAR um item específico: /wisesave/lists/:listId/items/:itemId
+
+router.put('/:listId/items/:itemId/update',  updateItemInList)
 // O método PUT é geralmente usado para atualizar ou substituir um recurso.
 router.put('/:listId/items/:itemId', toggleItemCompleted);
+
 
 // Exporta o roteador para o app principal usar
 export default router;
