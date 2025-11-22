@@ -1,10 +1,10 @@
-
+import { API_URL } from '@env';
 import {
   View,
   Text,
-  FlatList,
+  FlatList, // Não usado, mas mantido
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity, // Não usado, mas mantido
   ScrollView,
   Alert,
 } from "react-native";
@@ -13,30 +13,33 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import OptionItem from "@/components/accountScreen/optionItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-//import { AccountSettingsDialog } from '@/components/accountScreen/accountSettingsDialog';
 import { router } from "expo-router";
+// 🚨 IMPORTAR O MODAL REUTILIZÁVEL
+import UpdateDataModal from '../../components/accountScreen/updateDataModal';
 
 
 const account = () => {
 
   const [user, setUser] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Manter se necessário
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
+  // ESTADOS PARA O MODAL
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editMode, setEditMode] = useState(''); // 'username', 'email' ou 'password'
+  const [isSaving, setIsSaving] = useState(false);
 
-  //carregar os dados do usuário logo ao acessar a tela
   useEffect(() => {
     loadUser();
   }, []);
-  //carregar usuário
+
+  // --- FUNÇÕES DE LÓGICA DO USUÁRIO ---
   const loadUser = async () => {
     try {
       const userData = await AsyncStorage.getItem("user");
-      console.log("📦 Dados brutos do AsyncStorage:", userData); // Ver o que tem salvo
-
       if (userData) {
-
         setUser(JSON.parse(userData));
-
       }
     } catch (error) {
       console.error("Erro ao carregar usuário:", error);
@@ -47,18 +50,17 @@ const account = () => {
     try {
       // REMOVER TOKEN E DADOS DO ASYNCSTORAGE
       await AsyncStorage.multiRemove(["token", "user"]);
-
       // Opcional: Mostrar mensagem
       Alert.alert("Sucesso", "Você saiu da conta!");
       // Redirecionar para login
       router.dismissAll(); // Fecha todas as telas
       router.replace("/");
-
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       Alert.alert("Erro", "Não foi possível sair");
     }
   }
+
 
   const handleLogout = () => {
     Alert.alert(
@@ -76,11 +78,9 @@ const account = () => {
         }
       ]
     )
-
   }
 
   const handleDeleteAccount = () => {
-
     Alert.alert(
       "Sair",
       "Tem certeza que deseja deletar a conta?",
@@ -98,30 +98,25 @@ const account = () => {
     )
   }
 
-
   const deleteAccount = async () => {
     try {
       // Pegar o token
       const token = await AsyncStorage.getItem("token");
-
       if (!token) {
         Alert.alert("Erro", "Você não está autenticado");
         return;
       }
-
       // Fazer requisição para deletar
       await axios.delete(
-        "http://10.204.25.138:3000/wisesave/user/delete",
+        `${API_URL}/wisesave/user/delete`,
         {
           headers: {
             Authorization: `Bearer ${token}`
           }
         }
       );
-
       // Limpar AsyncStorage
       await AsyncStorage.multiRemove(["token", "user"]);
-
       // Redirecionar para login
       Alert.alert("Sucesso", "Conta deletada com sucesso!", [
         {
@@ -132,7 +127,6 @@ const account = () => {
           }
         }
       ]);
-
     } catch (error) {
       console.error("Erro ao deletar conta:", error);
       Alert.alert(
@@ -142,28 +136,84 @@ const account = () => {
     }
   }
 
+  // FUNÇÃO PARA ABRIR O MODAL
+  const handleEdit = (mode) => {
+    // Só abre se os dados do usuário tiverem sido carregados
+    if (user) {
+      setEditMode(mode);
+      setIsModalVisible(true);
+    } else {
+      Alert.alert("Aviso", "Aguarde o carregamento dos dados do usuário.");
+    }
+  };
 
+  //FUNÇÃO PARA SALVAR E ENVIAR DADOS PARA A API
+  const handleSaveData = async (mode, newValue) => {
+    setIsSaving(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) throw new Error("Token não encontrado.");
+
+      const field = mode === 'username' ? 'name' : mode;
+      const dataToSend = { [field]: newValue };
+
+      const response = await axios.put(
+        `${API_URL}/wisesave/user/update`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // ATUALIZA O TOKEN NO ASYNCSTORAGE (se o backend retornar novo token)
+      if (response.data.token) {
+        await AsyncStorage.setItem("token", response.data.token);
+      }
+
+      // Atualiza o estado local
+      if (mode === 'username') {
+        setUserName(newValue);
+      } else if (mode === 'email') {
+        setUserEmail(newValue);
+      }
+
+      // Atualiza o objeto user 
+      setUser(prev => ({
+        ...prev,
+        [field]: newValue
+      }));
+
+      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        error.response?.data?.message || "Erro ao salvar dados"
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-
     <ScrollView contentContainerStyle={styles.scrollContent}>
 
-      {/*Header*/}
+      {/*  header */}
       <View style={styles.header}>
-        {/*Text */}
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>Configurações</Text>
           <Text style={styles.headerSubTitle}>gerencie seus dados e preferencias</Text>
         </View>
       </View>
 
-      {/*User data container*/}
       <View style={styles.userDataContainer}>
-        {/*user icon*/}
         <View style={styles.userIcon}>
           <IconSymbol name="user" size={20} color="white" />
         </View>
-        {/*user data*/}
         <View style={styles.userDataText}>
           <Text style={styles.userDataName}>{user?.name || "Usuário"}</Text>
           <Text style={styles.userDataEmail}>{user?.email || ""}</Text>
@@ -171,14 +221,23 @@ const account = () => {
       </View>
 
 
-      {/*Options container - component*/}
+      {/* container opcoes 1 */}
       <View style={styles.optionsContainer}>
-        <OptionItem iconName="user" text="Alterar nome usuário" bgIcon="default" />
-        <OptionItem iconName="email" text="Alterar email" bgIcon="default" />
-
-
+        <OptionItem
+          iconName="user"
+          text="Alterar nome usuário"
+          bgIcon="default"
+          onPress={() => handleEdit('username')} // 🆕 Ação para abrir o modal
+        />
+        <OptionItem
+          iconName="email"
+          text="Alterar email"
+          bgIcon="default"
+          onPress={() => handleEdit('email')} // 🆕 Ação para abrir o modal
+        />
       </View>
 
+      {/* container opcoes 2 */}
       <View style={styles.optionsContainer}>
         <OptionItem iconName="bell" text="Ativar Notificações" bgIcon="default" />
         <OptionItem iconName="moon" text="Modo noturno" bgIcon="default" />
@@ -191,17 +250,28 @@ const account = () => {
       </View>
 
 
+      {/* modal */}
+      <UpdateDataModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        mode={editMode}
+        currentValue={
+          editMode === 'username' ? user?.name :
+            editMode === 'email' ? user?.email :
+              ''
+        }
+        onSave={handleSaveData}
+        isSaving={isSaving}
+      />
 
     </ScrollView>
 
   );
 }
 
-
+// ... (Estilos mantidos) ...
 const styles = StyleSheet.create({
-
-
-
+  //... (Estilos originais aqui)
   header: {
     backgroundColor: "rgba(56, 202, 88, 1)",
     height: 120
@@ -322,10 +392,6 @@ const styles = StyleSheet.create({
 
     marginRight: 15
   }
-
-
-
-
 });
 
 export default account;

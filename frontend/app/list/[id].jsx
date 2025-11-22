@@ -7,7 +7,7 @@ import {
 import { useLocalSearchParams } from 'expo-router'; // Hook para pegar o ID da URL
 
 // !!! Lembre-se de usar o SEU IP e a SUA PORTA !!!
-const API_URL = 'http://10.204.25.138:3000/api/lists'; // Use o seu IP!
+const API_URL = 'http://192.168.3.56:3000/wisesave/lists'; // Use o seu IP!
 
 export default function ListDetailScreen() {
   const { id: listId } = useLocalSearchParams(); // Pega o 'id' e renomeia para 'listId'

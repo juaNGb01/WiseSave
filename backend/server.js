@@ -33,7 +33,7 @@ app.get('/wisesave', (req, res) => {
 
 //trata as autenticações login + cadastro
 app.use("/wisesave/auth", authRoutes);
-app.use("/api/lists", listRoutes); 
+app.use("/wisesave/lists", listRoutes); 
 app.use("/wisesave/user", userRoutes);
 
 

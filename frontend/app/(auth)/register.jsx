@@ -1,3 +1,4 @@
+import { API_URL } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -13,7 +14,7 @@ import axios from "axios";
 import { router } from "expo-router";
 
 //configurar conforme o ip local
-const API_BASE_URL = 'http://10.204.25.138:3000/wisesave/auth';
+//const API_BASE_URL = 'http://192.168.3.56:3000/wisesave/auth';
 
 export default function RegisterScreen() {
 
@@ -38,7 +39,7 @@ export default function RegisterScreen() {
       }
       setLoading(true)
       try {
-        const response = await axios.post(`${API_BASE_URL}/register`, {
+        const response = await axios.post(`${API_URL}/wisesave/auth/register`, {
           userName,
           email,
           password
@@ -52,6 +53,7 @@ export default function RegisterScreen() {
           ]
         )
       } catch (error) {
+        console.log(error)
         const errorMessage = error.response?.data?.message || "Erro de conexão. Tente novamente.";
         Alert.alert("Falha no Cadastro", errorMessage);
       } finally {

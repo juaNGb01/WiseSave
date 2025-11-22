@@ -1,3 +1,4 @@
+import { API_URL } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -20,7 +21,7 @@ export default function ShopListScreen() {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState("un");
-  const [tempItems, setTempItems] = useState([]); 
+  const [tempItems, setTempItems] = useState([]);
 
   const handleAddItemToList = () => {
     if (itemName.trim() === "") {
@@ -30,7 +31,7 @@ export default function ShopListScreen() {
     const numQuantity = parseFloat(quantity.replace(",", ".")) || 1;
     const itemUnit = unit.trim() || "un";
 
-    const newItem = { 
+    const newItem = {
       id: Date.now().toString(),
       name: itemName.trim(),
       quantity: numQuantity,
@@ -44,50 +45,49 @@ export default function ShopListScreen() {
     Keyboard.dismiss();
   };
 
-  const handleRemoveItem = (id) => { 
+  const handleRemoveItem = (id) => {
     setTempItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
- // O NOVO handleFinish, com a "ligação" para o backend
-const handleFinish = async () => { // Adicionamos 'async' aqui
+  // O NOVO handleFinish, com a "ligação" para o backend
+  const handleFinish = async () => { // Adicionamos 'async' aqui
 
-  // 1. Validação (ver se o usuário adicionou itens)
-  if (tempItems.length === 0) {
-    Alert.alert("Erro", "Adicione pelo menos um item à lista.");
-    return;
-  }
-
-  // 2. Definir o endereço do backend
-  // !!! TROQUE O IP E A PORTA PELOS SEUS !!!
-  const API_URL = 'http://10.204.25.138:3000/wisesave/lists';
-
-  try {
-    // 3. Fazer a "ligação" (fetch)
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // 4. Envia os dados no formato que o backend espera
-      body: JSON.stringify({
-        name: "Minha Lista de Teste", // Vamos arrumar isso depois
-        items: tempItems 
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error('Erro na rede ou o servidor falhou');
+    // 1. Validação (ver se o usuário adicionou itens)
+    if (tempItems.length === 0) {
+      Alert.alert("Erro", "Adicione pelo menos um item à lista.");
+      return;
     }
 
-    // 5. Se deu certo, mostre o alerta e volte
-    Alert.alert("Sucesso!", "Sua lista foi salva no backend!");
-    router.back();
+    // 2. Definir o endereço do backend
+    const API_LIST_URL = `${API_URL}/wisesave/lists/`;
 
-  } catch (error) {
-    console.error("Erro ao salvar a lista:", error);
-    Alert.alert("Erro", "Não foi possível salvar a lista. Verifique o console.");
-  }
-};
+    try {
+      // 3. Fazer a "ligação" (fetch)
+      const response = await fetch(API_LIST_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // 4. Envia os dados no formato que o backend espera
+        body: JSON.stringify({
+          name: "Minha Lista de Teste", // Vamos arrumar isso depois
+          items: tempItems
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro na rede ou o servidor falhou');
+      }
+
+      // 5. Se deu certo, mostre o alerta e volte
+      Alert.alert("Sucesso!", "Sua lista foi salva no backend!");
+      router.back();
+
+    } catch (error) {
+      console.error("Erro ao salvar a lista:", error);
+      Alert.alert("Erro", "Não foi possível salvar a lista. Verifique o console.");
+    }
+  };
 
   return (
     <View style={styles.container}>

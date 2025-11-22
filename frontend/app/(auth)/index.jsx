@@ -1,3 +1,4 @@
+import { API_URL } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -12,8 +13,7 @@ import { router } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//alterar ip para o da maquina
-const API_BASE_URL = "http://10.204.25.138:3000/wisesave/auth";
+
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
+      const response = await axios.post(`${API_URL}/wisesave/auth/login`, {
         email,
         password,
       });
