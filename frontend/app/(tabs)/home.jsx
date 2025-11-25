@@ -9,7 +9,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import axios from 'axios'; // Importando apenas o Axios
 
 // ✅ ROTA CORRETA (Baseada no seu app.use("/wisesave/lists"))
-const API_LIST_URL = `${API_URL}/wisesave/lists/`; 
+const API_LIST_URL = `${API_URL}/wisesave/lists//`; 
 
 // --- COMPONENTE DO "CARD" ---
 const ListCard = ({ list, onDelete }) => {
@@ -83,7 +83,7 @@ export default function Index() {
   const handleDeleteList = async (id) => {
     try {
       // Axios Delete
-      await axios.delete(`${API_LIST_URL}${id}`);
+      await axios.delete(`${API_LIST_URL}/${id}`);
       
       // Atualização otimista (Remove da tela imediatamente)
       setLists(prevLists => prevLists.filter(list => list._id !== id));

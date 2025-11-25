@@ -15,6 +15,8 @@ const itemSchema = new mongoose.Schema({
   },
 });
 
+itemSchema.set('toJSON', { getters: true });
+
 // Este é o "molde" da LISTA DE COMPRAS
 const listSchema = new mongoose.Schema({
   name: { type: String, required: true },

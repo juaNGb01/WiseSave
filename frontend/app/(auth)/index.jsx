@@ -37,10 +37,10 @@ export default function LoginScreen() {
 
       const { token, message, id, name, email: userEmail } = response.data;
       
-      // console.log("Token:", token);
-      // console.log("ID:", id);
-      // console.log("Name:", name);
-      // console.log("Email:", userEmail);
+        console.log("Token:", token);
+        console.log("ID:", id);
+       console.log("Name:", name);
+        console.log("Email:", userEmail);
 
       if (token && id) {
         await AsyncStorage.setItem("token", token);

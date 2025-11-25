@@ -1,20 +1,21 @@
 import { API_URL } from '@env';
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, StyleSheet, FlatList, 
-  ActivityIndicator, SafeAreaView, TouchableOpacity, Alert 
+import {
+  View, Text, StyleSheet, FlatList,
+  ActivityIndicator, SafeAreaView, TouchableOpacity, Alert,
+  Pressable, Platform
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import EditItemModal from '../../components/listScreen/EditItemModal'; 
+import EditItemModal from '../../components/listScreen/EditItemModal';
 
-const API_LIST_URL = `${API_URL}/wisesave/lists`;
+const API_LIST_URL = `${API_URL}/wisesave/lists/`;
 
 export default function ListDetailScreen() {
   const { id: listId } = useLocalSearchParams();
   const [list, setList] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Estados para o modal
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function ListDetailScreen() {
     const fetchListDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${API_LIST_URL}/${listId}`);
+        const response = await axios.get(`${API_LIST_URL}${listId}`);
         setList(response.data);
       } catch (error) {
         console.error("Erro ao buscar detalhes:", error);
@@ -35,7 +36,7 @@ export default function ListDetailScreen() {
         setIsLoading(false);
       }
     };
-    
+
     fetchListDetails();
   }, [listId]);
 
@@ -48,8 +49,8 @@ export default function ListDetailScreen() {
 
     // 2. Update Otimista no Frontend (Atualiza a UI antes do servidor responder)
     setList(currentList => {
-      const updatedItems = currentList.items.map(item => 
-        item._id === selectedItem._id 
+      const updatedItems = currentList.items.map(item =>
+        item._id === selectedItem._id
           ? { ...item, ...updatedFields } // Mescla os dados antigos com os novos
           : item
       );
@@ -62,9 +63,9 @@ export default function ListDetailScreen() {
 
     // 3. Envia para o Backend
     try {
-      
-      const url = `${API_LIST_URL}/${listId}/items/${selectedItem._id}/update`;
-      
+
+      const url = `${API_LIST_URL}${listId}/items/${selectedItem._id}/update`;
+
       // Envia o corpo da requisição (req.body) com os campos atualizados
       await axios.put(url, updatedFields);
 
@@ -73,7 +74,7 @@ export default function ListDetailScreen() {
     } catch (error) {
       console.error("Erro ao salvar edição:", error);
       Alert.alert("Erro", "Falha ao salvar alterações. Revertendo...");
-      
+
       // 4. Reverte para o estado anterior em caso de erro
       setList(previousList);
     }
@@ -100,7 +101,7 @@ export default function ListDetailScreen() {
       // CORREÇÃO IMPORTANTE: O axios.put precisa do segundo parâmetro (o corpo/body)
       // Senão o backend recebe um body vazio e não atualiza nada.
       await axios.put(
-        `${API_LIST_URL}/${listId}/items/${itemId}`, 
+        `${API_LIST_URL}/${listId}/items/${itemId}`,
         { completed: newStatus }
       );
     } catch (error) {
@@ -110,6 +111,52 @@ export default function ListDetailScreen() {
       setList(response.data);
     }
   };
+
+  const handleFinishList = async () => {
+    // 1. Verifica se TODOS os itens já estão concluídos
+    const allCompleted = list.items.every(item => item.completed);
+    
+    // 2. Define o novo status (se tudo tá concluído, vira false. Se não, vira true)
+    const newStatus = !allCompleted;
+
+    // 3. Guardar estado anterior para rollback em caso de erro
+    const previousList = { ...list };
+
+    // 4. Optimistic Update (Atualiza a UI instantaneamente)
+    setList(currentList => ({
+      ...currentList,
+      items: currentList.items.map(item => ({
+        ...item,
+        completed: newStatus
+      }))
+    }));
+
+    try {
+      // 5. Filtrar apenas os itens que precisam ser alterados para evitar requisições inúteis
+      // Ex: Se vou marcar tudo como TRUE, não preciso enviar quem já é TRUE.
+      const itemsToUpdate = list.items.filter(item => item.completed !== newStatus);
+
+      // 6. Criar um array de promessas (requisições) para rodar em paralelo
+      const updatePromises = itemsToUpdate.map(item => 
+        axios.put(
+          `${API_LIST_URL}/${listId}/items/${item._id}`, 
+          { completed: newStatus }
+        )
+      );
+
+      // Aguarda todas as requisições terminarem
+      await Promise.all(updatePromises);
+
+    } catch (error) {
+      console.error("Erro ao atualizar todos os itens:", error);
+      
+      // Em caso de erro, reverte para o estado anterior ou busca do servidor
+      // setList(previousList); // Opção A: Reverter localmente
+      
+      const response = await axios.get(`${API_LIST_URL}/${listId}`); // Opção B: Garantir consistência
+      setList(response.data);
+    }
+};
 
   const handleEditItem = (item) => {
     setSelectedItem(item);
@@ -140,17 +187,17 @@ export default function ListDetailScreen() {
         data={list.items}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.itemContainer} 
+          <TouchableOpacity
+            style={styles.itemContainer}
             onLongPress={() => handleEditItem(item)}
           >
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.checkbox, item.completed && styles.checkboxCompleted]}
               onPress={() => handleToggleItem(item._id)}
             >
               {item.completed && <Text style={styles.checkmark}>✓</Text>}
             </TouchableOpacity>
-            
+
             <View style={styles.itemInfo}>
               <Text style={[styles.itemName, item.completed && styles.itemNameCompleted]}>
                 {item.name}
@@ -161,7 +208,7 @@ export default function ListDetailScreen() {
               </Text>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.editButton}
               onPress={() => handleEditItem(item)}
             >
@@ -172,7 +219,30 @@ export default function ListDetailScreen() {
         style={styles.list}
       />
 
-      {/* CONEXÃO FEITA AQUI: Passando a função handleSaveEditedItem */}
+     <View style={styles.footerContainer}>
+      
+      {/* Seção do Preço */}
+      <View style={styles.priceContainer}>
+        <Text style={styles.totalLabel}>Total estimado</Text>
+        <Text style={styles.totalValue}>
+          <Text style={styles.currencySymbol}>R$</Text> 
+          {/* {totalValue.toFixed(2).replace('.', ',')} */}
+        </Text>
+      </View>
+
+      {/* Botão de Ação */}
+      <Pressable 
+        onPress={handleFinishList}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed
+        ]}
+      >
+        <Text style={styles.buttonText}>Finalizar Lista</Text>
+      </Pressable>
+    </View>
+
+      {/* Modal */}
       <EditItemModal
         item={selectedItem}
         isOpen={isModalOpen}
@@ -180,7 +250,7 @@ export default function ListDetailScreen() {
           setIsModalOpen(false);
           setSelectedItem(null);
         }}
-        onSave={handleSaveEditedItem} 
+        onSave={handleSaveEditedItem}
       />
     </SafeAreaView>
   );
@@ -233,4 +303,64 @@ const styles = StyleSheet.create({
   editButtonText: {
     fontSize: 18,
   },
+  footerContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20, // Ajuste para iPhone X+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    // Sombra para dar profundidade (flutuando sobre a lista)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 10,
+  },
+  priceContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  totalLabel: {
+    fontSize: 12,
+    color: '#6B7280', // Cinza médio
+    fontWeight: '500',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  totalValue: {
+    fontSize: 24,
+    color: '#1F2937', // Quase preto
+    fontWeight: '700',
+  },
+  currencySymbol: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  button: {
+    backgroundColor: '#10B981', // Verde Esmeralda (passa a ideia de "Sucesso/Concluir")
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  buttonPressed: {
+    backgroundColor: '#059669', // Verde mais escuro ao pressionar
+    transform: [{ scale: 0.98 }], // Leve efeito de clique
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  }
 });

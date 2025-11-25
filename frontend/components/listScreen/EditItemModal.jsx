@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -16,7 +16,7 @@ const EditItemModal = ({ item, isOpen, onClose, onSave }) => {
     name: item?.name || '',
     quantity: item?.quantity?.toString() || '1',
     unit: item?.unit || 'un',
-    price: item?.price?.toString() || ''
+    price: item?.price?.toString() || '0'
   });
 
   const [showUnitPicker, setShowUnitPicker] = useState(false);
@@ -30,6 +30,17 @@ const EditItemModal = ({ item, isOpen, onClose, onSave }) => {
     { label: 'Caixa', value: 'cx' },
     { label: 'Pacote', value: 'pct' }
   ];
+
+    useEffect(() => {
+    if (item && isOpen) {
+      setFormData({
+        name: item.name || '',
+        quantity: item.quantity?.toString() || '1',
+        unit: item.unit || 'un',
+        price:  item.price?.toString() || '0'
+      });
+    }
+  }, [item, isOpen]);
 
   const handleChange = (name, value) => {
     setFormData(prev => ({
@@ -188,10 +199,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    padding: 20, // Adicionado padding para evitar que o modal cole nas bordas da tela
   },
   modalContainer: {
-    width: '90%',
+    width: '100%',
     maxWidth: 500,
     backgroundColor: 'white',
     borderRadius: 12,
@@ -199,10 +211,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5
+    elevation: 5,
+    maxHeight: '80%', // Mantém a altura máxima
+    flex: 1, // MUDANÇA: Permite que o container gerencie o espaço interno
   },
   modalContent: {
-    maxHeight: '80%'
+    flex: 1, // MUDANÇA: Faz o conteúdo ocupar toda a altura do container
+    justifyContent: 'space-between', // Garante distribuição correta
   },
   header: {
     flexDirection: 'row',
@@ -210,7 +225,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB'
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: 'white', // Garante que o header fique sobre o scroll se necessário
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   title: {
     fontSize: 20,
@@ -226,7 +244,8 @@ const styles = StyleSheet.create({
     fontWeight: '300'
   },
   form: {
-    padding: 20
+    padding: 30,
+    flex: 1, // MUDANÇA CRUCIAL: O ScrollView agora empurra os botões para baixo e rola o conteúdo do meio
   },
   fieldContainer: {
     marginBottom: 16
@@ -295,24 +314,30 @@ const styles = StyleSheet.create({
   },
   unitOptionTextSelected: {
     color: '#2563EB',
-    fontWeight: '600'
+    fontWeight: '600',
   },
   buttonContainer: {
     flexDirection: 'row',
     padding: 20,
-    gap: 12
+    gap: 12,
+    borderTopWidth: 1, // MUDANÇA: Borda apenas em cima para separar visualmente
+    borderTopColor: '#E5E7EB',
+    backgroundColor: 'white', // Garante opacidade
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    // Removida a borda preta de debug que você mencionou
   },
   button: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   cancelButton: {
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
   },
   cancelButtonText: {
     fontSize: 16,
