@@ -9,7 +9,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import axios from 'axios'; // Importando apenas o Axios
 
 // ✅ ROTA CORRETA (Baseada no seu app.use("/wisesave/lists"))
-const API_LIST_URL = `${API_URL}/wisesave/lists//`; 
+const API_LIST_URL = `${API_URL}/wisesave/lists`; 
 
 // --- COMPONENTE DO "CARD" ---
 const ListCard = ({ list, onDelete }) => {
@@ -63,7 +63,7 @@ export default function Index() {
     setIsLoading(true);
     try {
       // O Axios já trata o JSON automaticamente e lança erro se não for 2xx
-      const response = await axios.get(API_LIST_URL);
+      const response = await axios.get(API_LIST_URL+'/');
       setLists(response.data);
     } catch (error) {
       console.error("Erro ao buscar listas:", error);

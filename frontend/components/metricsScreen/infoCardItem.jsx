@@ -6,6 +6,7 @@ export default function InfoCardItem({ item }) {
     const { title, value, description, icon } = item;
     const isMonetaryValue = !isNaN(parseFloat(value));
 
+
     return (
         <View style={styles.infoCardContainer}>
             <View style={styles.infoCardText}>
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
 
   iconPosition: {
     position: "absolute",
-    left: "85%",
+    left: "90%",
     top: 20
 
   },

@@ -67,7 +67,42 @@ export const deleteList = async (req, res) => {
   }
 };
 
-// --- 5. FUNÇÃO PARA "TICAR" UM ITEM ---
+export const updateList = async (req, res) => {
+  try {
+    const {id} = req.params;
+
+    const list = await ShoppingList.findById(id);
+    if (!list) {
+      return res.status(404).json({ message: 'Lista não encontrada.' });
+    }
+
+    // Calcula o total somando price * quantity apenas dos itens completed: true
+    const total = list.items.reduce((sum, item) => {
+      if (item.completed) {
+        const itemPrice = parseFloat(item.price.toString());
+        return sum + (itemPrice * item.quantity);
+      }
+      return sum;
+    }, 0);
+
+    list.totalPrice = total;
+    await list.save();
+
+    res.status(200).json({ 
+      message: 'Total atualizado com sucesso',
+      totalPrice: total,
+      list: list // Retorna a lista atualizada se você precisar no frontend
+    });
+
+  } catch (error) {
+    console.error('Erro em updateListTotalPrice:', error);
+    res.status(500).json({ message: 'Erro no servidor.' });
+  }
+};
+
+
+
+// --- 5. FUNÇÃO PARA MARCAR UM ITEM ---
 export const toggleItemCompleted = async (req, res) => {
   try {
     const { listId, itemId } = req.params;
@@ -95,7 +130,7 @@ export const toggleItemCompleted = async (req, res) => {
     res.status(500).json({ message: 'Erro no servidor.' });
   }
 };
-
+// ATT ITENS DA LISTA
 export const updateItemInList = async (req, res) => {
   try {
     // Precisamos de dois IDs agora: O da Lista e o do Item

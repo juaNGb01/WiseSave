@@ -13,7 +13,10 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import axios from 'axios';
 
+// ✅ Defina a URL COM BARRA no final (padrão REST)
+const API_LIST_URL = `${API_URL}/wisesave/lists/`;
 
 export default function ShopListScreen() {
   const router = useRouter();
@@ -50,51 +53,37 @@ export default function ShopListScreen() {
     setTempItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  // O NOVO handleFinish, com a "ligação" para o backend
-  const handleFinish = async () => { // Adicionamos 'async' aqui
-
-     if (listName === "" ) {
-      Alert.alert("Erro", "Adicione um nome a sua lista.");
+  // ✅ Usando AXIOS (igual no outro arquivo)
+  const handleFinish = async () => {
+    // Validação do nome da lista
+    if (listName.trim() === "") {
+      Alert.alert("Erro", "Adicione um nome à sua lista.");
       return;
     }
 
-    // 1. Validação (ver se o usuário adicionou itens)
+    // Validação dos itens
     if (tempItems.length === 0) {
       Alert.alert("Erro", "Adicione pelo menos um item à lista.");
       return;
     }
 
-   
-    // 2. Definir o endereço do backend
-    const API_LIST_URL = `${API_URL}/wisesave/lists/`;
-
     try {
-      // 3. Fazer a "ligação" (fetch)
-      const response = await fetch(API_LIST_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // 4. Envia os dados no formato que o backend espera
-        body: JSON.stringify({
-          name: listName, // Vamos arrumar isso depois
-          items: tempItems
-        })
+      // ✅ POST com Axios (sem precisar adicionar barra, já está na constante)
+      const response = await axios.post(API_LIST_URL, {
+        name: listName.trim(),
+        items: tempItems
       });
 
-      if (!response.ok) {
-        throw new Error('Erro na rede ou o servidor falhou');
-      }
-
-      // 5. Se deu certo, mostre o alerta e volte
-      Alert.alert("Sucesso!", "Sua lista foi salva no backend!");
+      // Sucesso
+      Alert.alert("Sucesso!", "Sua lista foi salva!");
       router.back();
 
     } catch (error) {
       console.error("Erro ao salvar a lista:", error);
-      Alert.alert("Erro", "Não foi possível salvar a lista. Verifique o console.");
+      Alert.alert("Erro", "Não foi possível salvar a lista.");
     }
   };
+
 
   return (
     <View style={styles.container}>

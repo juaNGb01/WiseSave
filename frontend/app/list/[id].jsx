@@ -9,7 +9,7 @@ import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import EditItemModal from '../../components/listScreen/EditItemModal';
 
-const API_LIST_URL = `${API_URL}/wisesave/lists/`;
+const API_LIST_URL = `${API_URL}/wisesave/lists`;
 
 export default function ListDetailScreen() {
   const { id: listId } = useLocalSearchParams();
@@ -27,7 +27,7 @@ export default function ListDetailScreen() {
     const fetchListDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${API_LIST_URL}${listId}`);
+        const response = await axios.get(`${API_LIST_URL}/${listId}`);
         setList(response.data);
       } catch (error) {
         console.error("Erro ao buscar detalhes:", error);
@@ -64,7 +64,7 @@ export default function ListDetailScreen() {
     // 3. Envia para o Backend
     try {
 
-      const url = `${API_LIST_URL}${listId}/items/${selectedItem._id}/update`;
+      const url = `${API_LIST_URL}/${listId}/items/${selectedItem._id}/update`;
 
       // Envia o corpo da requisição (req.body) com os campos atualizados
       await axios.put(url, updatedFields);
@@ -113,16 +113,11 @@ export default function ListDetailScreen() {
   };
 
   const handleFinishList = async () => {
-    // 1. Verifica se TODOS os itens já estão concluídos
     const allCompleted = list.items.every(item => item.completed);
-    
-    // 2. Define o novo status (se tudo tá concluído, vira false. Se não, vira true)
     const newStatus = !allCompleted;
-
-    // 3. Guardar estado anterior para rollback em caso de erro
     const previousList = { ...list };
 
-    // 4. Optimistic Update (Atualiza a UI instantaneamente)
+    // Optimistic Update
     setList(currentList => ({
       ...currentList,
       items: currentList.items.map(item => ({
@@ -132,11 +127,8 @@ export default function ListDetailScreen() {
     }));
 
     try {
-      // 5. Filtrar apenas os itens que precisam ser alterados para evitar requisições inúteis
-      // Ex: Se vou marcar tudo como TRUE, não preciso enviar quem já é TRUE.
       const itemsToUpdate = list.items.filter(item => item.completed !== newStatus);
 
-      // 6. Criar um array de promessas (requisições) para rodar em paralelo
       const updatePromises = itemsToUpdate.map(item => 
         axios.put(
           `${API_LIST_URL}/${listId}/items/${item._id}`, 
@@ -144,16 +136,23 @@ export default function ListDetailScreen() {
         )
       );
 
-      // Aguarda todas as requisições terminarem
+      // Aguarda todas as atualizações de itens
       await Promise.all(updatePromises);
 
+      // NOVO: Recalcula o total da lista após atualizar os itens
+      const totalResponse = await axios.put(`${API_LIST_URL}/updateList/${listId}`);
+      
+      // Atualiza o totalPrice no estado local
+      setList(currentList => ({
+        ...currentList,
+        totalPrice: totalResponse.data.totalPrice
+      }));
+
     } catch (error) {
-      console.error("Erro ao atualizar todos os itens:", error);
+      console.error("Erro ao atualizar itens ou total:", error);
       
-      // Em caso de erro, reverte para o estado anterior ou busca do servidor
-      // setList(previousList); // Opção A: Reverter localmente
-      
-      const response = await axios.get(`${API_LIST_URL}/${listId}`); // Opção B: Garantir consistência
+      // Busca do servidor para garantir consistência
+      const response = await axios.get(`${API_LIST_URL}/${listId}`);
       setList(response.data);
     }
 };
@@ -179,6 +178,15 @@ export default function ListDetailScreen() {
       </SafeAreaView>
     );
   }
+
+  const totalValue = list?.items?.reduce((sum, item) => {
+    const quantity = parseFloat(item.quantity) || 0;
+    const price = parseFloat(item.price) || 0;
+    return sum + (quantity * price);
+  }, 0) || 0;
+
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -225,8 +233,8 @@ export default function ListDetailScreen() {
       <View style={styles.priceContainer}>
         <Text style={styles.totalLabel}>Total estimado</Text>
         <Text style={styles.totalValue}>
-          <Text style={styles.currencySymbol}>R$</Text> 
-          {/* {totalValue.toFixed(2).replace('.', ',')} */}
+          <Text style={styles.currencySymbol}>R$: </Text> 
+          {totalValue.toFixed(2).replace('.', ',')} 
         </Text>
       </View>
 

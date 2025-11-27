@@ -1,133 +1,159 @@
-import InfoCardItem from "@/components/metricsScreen/infoCardItem";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import React from "react";
+import InfoCardItem from "@/components/metricsScreen/infoCardItem.jsx";
+import React, { useState, useEffect } from "react";
 import {
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
+  Alert
 } from "react-native";
 import { BarChart } from 'react-native-gifted-charts';
+import BtnSelection from "@/components/metricsScreen/BtnSelection.jsx";
+import axios from "axios"; // Não esqueça de instalar: npm install axios
+import { API_URL } from '@env';
+
+
+const API_METRICS = `${API_URL}/wisesave/metrics/summary`
 
 
 
-
-const cardsData = [
-  {
-    id: "1",
-    title: "Total comprado",
-    value: "1000.60",
-    description: "total comprado no mês",
-    icon: "dolar"
-  },
-
-  {
-    id: "2",
-    title: "Maior Compra",
-    value: "250",
-    description: "Valor unico mais alto",
-    icon: "chart-line"
-  },
-
-  {
-    id: "3",
-    title: "Produo mais caro",
-    value: "32",
-    description: "Carne Bovina",
-    icon: "box-open"
-  },
-
-  {
-    id: "4",
-    title: "Mais comprado",
-    value: "Pão Francês",
-    description: "produto em maior quantidade",
-    icon: "cart-shop"
-  },
-
-]
-
-// 1. Definição dos dadosww
-const barData = [
-  { value: 10, label: 'Jan' },
-  { value: 65, label: 'Fev' },
-  { value: 50, label: 'Mar' },
-  { value: 75, label: 'Abr' },
+const initialBarData = [
+  { value: 0, label: '-' },
+  { value: 0, label: '-' },
+  { value: 0, label: '-' },
+  { value: 0, label: '-' },
 ];
 
-const Chart = () => {
+const Metrics = () => {
+
+  // 1. Estados
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [metricsData, setMetricsData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chartData, setChartData] = useState(initialBarData); //estado do grafico
+
+
+
+  // 2. Função para alterar o mês (será passada para o BtnSelection)
+  const changeMonth = (increment) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + increment);
+    setCurrentDate(newDate);
+  };
+
+  // 3. Busca os dados na API sempre que currentDate mudar
+  useEffect(() => {
+    fetchMetrics();
+  }, [currentDate]);
+
+
+  const fetchMetrics = async () => {
+    setIsLoading(true);
+    try {
+      const month = currentDate.getMonth(); // 0 a 11
+      const year = currentDate.getFullYear();
+
+      // Chama a rota: .../summary?month=X&year=Y
+      const response = await axios.get(`${API_METRICS}?month=${month}&year=${year}`);
+      const data = response.data;
+      setMetricsData(data);
+
+      // --- MAPEAMENTO DO GRÁFICO ---
+      if (data.chartData) {
+        const formattedChart = data.chartData.map((item) => ({
+          value: item.value,
+          label: item.label.charAt(0).toUpperCase() + item.label.slice(1), // Capitaliza "Jan"
+          frontColor: item.isSelected ? '#17ceceff' : '#9CA3AF', // Destaque pro mês atual
+          topLabelComponent: () => (
+            <Text style={{ color: 'gray', fontSize: 10, marginBottom: 4 }}>
+              {item.value > 0 ? `R$${Math.floor(item.value)}` : ''}
+            </Text>
+          )
+        }));
+        setChartData(formattedChart);
+      }
+
+    } catch (error) {
+      console.error("Erro ao buscar métricas:", error);
+      setChartData(initialBarData);
+      // Opcional: Alert.alert("Erro", "Não foi possível carregar os dados.");
+      setMetricsData(null); // Reseta os dados em caso de erro
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 4. Mapeamento Dinâmico: Transforma os dados da API no formato dos Cards
+  // Se metricsData for null (carregando ou erro), usa valores zerados/padrão
+  const dynamicCardsData = [
+    {
+      id: "1",
+      title: "Total comprado",
+      value: metricsData ? `R$ ${metricsData.totalGasto.toFixed(2)}` : "R$ 0.00",
+      description: "total comprado no mês",
+      icon: "dolar"
+    },
+    {
+      id: "2",
+      title: "Maior Compra",
+      value: metricsData ? `R$ ${metricsData.maiorCompra.toFixed(2)}` : "R$ 0.00",
+      description: "Valor único mais alto",
+      icon: "chart-line"
+    },
+    {
+      id: "3",
+      title: "Produto mais caro",
+      value: metricsData ? `R$ ${metricsData.produtoMaisCaro.valor.toFixed(2)}` : "R$ 0.00",
+      description: metricsData ? metricsData.produtoMaisCaro.nome : "-",
+      icon: "box-open"
+    },
+    {
+      id: "4",
+      title: "Mais comprado",
+      value: metricsData ? metricsData.produtoMaisComprado.nome : "-",
+      description: metricsData ? `${metricsData.produtoMaisComprado.quantidade} unidades` : "0 unidades",
+      icon: "cart-shop"
+    },
+  ];
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
 
       <Text style={styles.title}>Gastos Mensais </Text>
 
       <BarChart
-        data={barData}
-        // tamanho da barra
+        data={chartData} // Agora usa o estado
         barWidth={35}
-
-        //posicao do grafico
-        initialSpacing={1}
-        endSpacing={10}
-        yAxisLabelWidth={70}
-
-        spacing={20}
-        frontColor="#17ceceff"
-
-        // arraedonda a barra
-        barBorderRadius={8}
-
-
-
-        yAxisThickness={0} //exibe ou não os eixos do grafico(y)
-        xAxisThickness={0} //exibe ou não os eixos do grafico(x)
-        xAxisColor="#054a42ff" //cor do eixo 
-        rulesColor="#dadadaff"
-
-        // rulesType="solid"
-        noOfSections={3} //indica quantas secoes tem o grafico
-
-        //config de uma linha para refencia(a media geral do valores)
-        showReferenceLine1
-        referenceLine1Position={50}
-        referenceLine1Config={{
-          color: '#000000ff',
-          dashWidth: 2,
-          dashGap: 3,
-
-        }
-        }
-
+        initialSpacing={20}
+        spacing={30}
+        barBorderRadius={4}
+        yAxisThickness={0}
+        xAxisThickness={0}
+        xAxisLabelTextStyle={{ color: 'gray' }}
+        yAxisTextStyle={{ color: 'gray' }}
+        noOfSections={3}
+        maxValue={Math.max(...chartData.map(d => d.value)) * 1.2 || 100} // Ajusta escala auto
+        isAnimated
       />
 
+      <BtnSelection
+        currentDate={currentDate}
+        onMonthChange={changeMonth}
+      />
 
-
-      <View style={styles.buttonSelectMonth}>
-        <Pressable onPress={() => { console.log("volta mes") }}>
-          <IconSymbol name="angle-left" size={20}></IconSymbol>
-        </Pressable>
-        <Text>nome mes</Text>
-        <Pressable onPress={() => { console.log("avança mes") }}>
-          <IconSymbol name="angle-right" size={20}></IconSymbol>
-        </Pressable>
-      </View>
-
-
+      {/* Exibição dos Cards ou Loading */}
       <View style={styles.cardsWrapper}>
-        {cardsData.map((item) => (
-          <InfoCardItem key={item.id} item={item} />
-        ))}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#17ceceff" style={{ marginTop: 20 }} />
+        ) : (
+          dynamicCardsData.map((item) => (
+            <InfoCardItem key={item.id} item={item} />
+          ))
+        )}
       </View>
-
-
-
 
     </ScrollView>
-
-
-
-
 
   );
 
@@ -176,5 +202,5 @@ const styles = StyleSheet.create({
 });
 
 
-export default Chart;
+export default Metrics;
 
