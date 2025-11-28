@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# 🛒 WiseSave - Controle de Listas de Compras
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+WiseSave é uma aplicação de lista de compras desenvolvida com React Native (Frontend) e Node.js/Express (Backend) que permite ao usuário gerenciar suas listas e visualizar métricas de gastos por mês. O projeto implementa filtros de segurança e agregação de dados em tempo real.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Como Rodar o Projeto
 
-   ```bash
-   npm install
-   ```
+Este projeto é dividido em dois ambientes independentes (`frontend` e `backend`). Ambos precisam ser inicializados separadamente.
 
-2. Start the app
+### Pré-requisitos
 
-   ```bash
-   npx expo start
-   ```
+Certifique-se de ter o **Node.js** (versão LTS recomendada) e o **MongoDB** instalados e funcionando em sua máquina.
 
-In the output, you'll find options to open the app in a
+### 1. Configuração do Backend (API - Express/Mongoose)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+1.  **Instalação de Dependências:**
+    Acesse a pasta `backend` e instale todos os pacotes:
+    ```bash
+    cd backend
+    npm install
+    ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+2.  **Configuração do Ambiente (`.env`)**
+    O arquivo **`.env`** na raiz da pasta `backend` já contem todos os dados necessários para rodar e acessar o banco de dados mongo
 
-## Get a fresh project
+3.  **Inicialização:**
+    Rode o servidor em modo de desenvolvimento:
+    ```bash
+    npm start
+    ```
+    O servidor estará acessível em `http://localhost:3000`.
 
-When you're ready, run:
+### 2. Configuração do Frontend (Mobile - React Native)
 
-```bash
-npm run reset-project
-```
+1.  **Instalação de Dependências:**
+    Acesse a pasta `frontend` e instale todas as dependências do React Native:
+    ```bash
+    cd ../frontend
+    npm install
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2.  **Ajuste do Arquivo de Ambiente (`.env`)** ⚠️
+    Dentro do arquivo **`.env`** na raiz da pasta `frontend` **ajuste o IP para o da sua máquina** para que o aplicativo móvel possa se comunicar com o seu servidor (Backend).
 
-## Learn more
+    | Variável | Exemplo de Valor | Descrição | |
+    | :--- | :--- | :--- | :--- |
+    | `API_BASE_URL` | `http://xx.xxx.xx.xxx:3000/wisesave` | **TROQUE** o IP pelo **endereço IP da sua máquina** na rede local. |
 
-To learn more about developing your project with Expo, look at the following resources:
+3.  **Inicialização:**
+    Inicie o Expo para rodar o app em um emulador ou dispositivo físico:
+    ```bash
+    npm start
+    ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 🔐 Estrutura de Autenticação e Segurança
 
-Join our community of developers creating universal apps.
+O projeto segue um fluxo de segurança rigoroso:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+* **Autenticação JWT:** As rotas que acessam dados privados (listas e métricas) são protegidas pelo **middleware `authenticateToken`**.
+* **Filtro por Usuário (Multi-Tenancy):** O `userId` é extraído do token e usado no estágio `$match` do Mongoose Aggregation, garantindo que o usuário visualize **apenas** as listas que ele criou.
+* **Modelo de Dados:** Cada lista é referenciada (via `ObjectId`) ao seu criador na coleção `User`.
+
+## 📊 Métricas Chave Implementadas
+
+A tela de métricas é alimentada por um único *Aggregation Pipeline* eficiente que retorna os seguintes dados por mês/usuário:
+
+| Métrica | Descrição |
+| :--- | :--- |
+| **Total Comprado** | Soma total do valor de todas as listas no mês. |
+| **Maior Compra** | O valor total mais alto de uma única lista (`totalPrice`). |
+| **Produto Mais Caro** | O item com o maior preço unitário no mês. |
+| **Produto Mais Comprado** | O item com a maior quantidade total acumulada no mês. |
+| **Gráfico Histórico** | Exibe a evolução dos gastos nos últimos 4 meses em barras dinâmicas. |
+
+---
+
+## 💻 Tecnologias Utilizadas
+
+| Camada | Tecnologia |
+| :--- | :--- |
+| **Frontend** | React Native (Expo) |
+| **Backend** | Node.js + Express |
+| **Banco de Dados** | MongoDB + Mongoose |
+| **Gráficos** | `react-native-gifted-charts` |

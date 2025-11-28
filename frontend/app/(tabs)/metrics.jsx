@@ -80,7 +80,6 @@ const Metrics = () => {
         if (data.chartData) {
             const formattedChart = data.chartData.map((item) => ({
                 value: item.value,
-                // Capitaliza o label (ex: "jan" -> "Jan")
                 label: capitalizeFirstLetter(item.label), 
                 // Destaque visual baseado no campo 'isSelected' que vem do backend
                 frontColor: item.isSelected ? '#17ceceff' : '#9CA3AF', 
@@ -93,7 +92,7 @@ const Metrics = () => {
                 )
             }));
             
-            // 4. ATUALIZAÇÃO DO ESTADO DO GRÁFICO
+          
             setChartData(formattedChart);
         }
 
@@ -106,7 +105,7 @@ const Metrics = () => {
     }
 };
 
-  // 4. Mapeamento Dinâmico: Transforma os dados da API no formato dos Cards
+  // mapeamento Dinâmico: Transforma os dados da API no formato dos Cards
   // Se metricsData for null (carregando ou erro), usa valores zerados/padrão
   const dynamicCardsData = [
     {
@@ -184,7 +183,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     alignItems: 'center',
-    flexGrow: 1, // Permite que o ScrollView cresça
+    flexGrow: 1, 
     backgroundColor: "white",
 
 

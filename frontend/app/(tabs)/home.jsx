@@ -9,10 +9,9 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import axios from 'axios'; // Importando apenas o Axios
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
-// ✅ ROTA CORRETA (Baseada no seu app.use("/wisesave/lists"))
 const API_LIST_URL = `${API_URL}/wisesave/lists`; 
 
-// --- COMPONENTE DO "CARD" ---
+
 const ListCard = ({ list, onDelete }) => {
   const router = useRouter();
 
@@ -53,7 +52,7 @@ const ListCard = ({ list, onDelete }) => {
   );
 };
 
-// --- TELA PRINCIPAL ---
+
 export default function Index() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -62,20 +61,19 @@ export default function Index() {
   const fetchLists = async () => {
   setIsLoading(true);
   
-  // 1. RECUPERAR O TOKEN DO ARMAZENAMENTO LOCAL
-  const token = await AsyncStorage.getItem("token"); // Adapte a chave se for diferente ("userToken")
+  //RECUPERAR O TOKEN
+  const token = await AsyncStorage.getItem("token"); 
 
   if (!token) {
       setIsLoading(false);
-      // Aqui você pode redirecionar para a tela de login
+  
       return Alert.alert("Sessão Expirada", "Faça login novamente.");
   }
 
   try {
-    // 2. ENVIAR O TOKEN NO CABEÇALHO 'Authorization'
+    // envia token no header
     const response = await axios.get(API_LIST_URL + '/', {
       headers: {
-        // Formato padrão esperado pelo middleware: Bearer <token>
         Authorization: `Bearer ${token}`, 
       },
     });
@@ -101,7 +99,7 @@ export default function Index() {
     }, [])
   );
 
-  // 2. DELETAR LISTA (Convertido para Axios)
+  // deletar lista
   const handleDeleteList = async (id) => {
     try {
       // Axios Delete
@@ -166,7 +164,7 @@ export default function Index() {
   );
 }
 
-// --- ESTILOS (Mantidos iguais) ---
+// estilos
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   center: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, flex: 1 },

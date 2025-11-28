@@ -40,15 +40,15 @@ export const getAllLists = async (req, res) => {
   const userId = req.userId; // <-- CAPTURANDO A VARIÁVEL QUE O MIDDLEWARE ANEXOU
 
   try {
-    // ⚠️ Validação: O token deve ter garantido que o ID existe, mas é bom checar.
+    
     if (!userId) {
-      // Isso só deveria ocorrer se o middleware falhar, mas é uma proteção.
+      
       return res.status(401).json({ message: 'Acesso negado. ID de usuário não encontrado.' });
     }
 
-    // 2. FILTRAGEM NO BANCO DE DADOS
+    //  FILTRAGEM 
     const userLists = await ShoppingList.find({
-      userId: userId // <-- Filtra APENAS pelas listas desse usuário
+      userId: userId // Filtra APENAS pelas listas desse usuário
     })
     .sort({ createdAt: -1 })
     .exec();
@@ -61,7 +61,7 @@ export const getAllLists = async (req, res) => {
   }
 };
 
-// --- 3. FUNÇÃO PARA BUSCAR UMA LISTA POR ID ---
+// função para buscar lista por id
 export const getListById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -78,7 +78,7 @@ export const getListById = async (req, res) => {
   }
 };
 
-// --- 4. FUNÇÃO PARA DELETAR UMA LISTA ---
+//deletar lista
 export const deleteList = async (req, res) => {
   try {
     const { id } = req.params;
@@ -130,7 +130,7 @@ export const updateList = async (req, res) => {
 
 
 
-// --- 5. FUNÇÃO PARA MARCAR UM ITEM ---
+// marcar item como concluido
 export const toggleItemCompleted = async (req, res) => {
   try {
     const { listId, itemId } = req.params;
@@ -158,7 +158,7 @@ export const toggleItemCompleted = async (req, res) => {
     res.status(500).json({ message: 'Erro no servidor.' });
   }
 };
-// ATT ITENS DA LISTA
+// Att itens da lista
 export const updateItemInList = async (req, res) => {
   try {
     // Precisamos de dois IDs agora: O da Lista e o do Item

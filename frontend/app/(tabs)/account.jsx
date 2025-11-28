@@ -21,7 +21,7 @@ import UpdateDataModal from '../../components/accountScreen/updateDataModal';
 const account = () => {
 
   const [user, setUser] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Manter se necessário
+  const [isDialogOpen, setIsDialogOpen] = useState(false); 
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
 

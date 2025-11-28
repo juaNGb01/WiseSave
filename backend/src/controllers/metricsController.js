@@ -62,7 +62,7 @@ export const getMonthlySummary = async (req, res) => {
             ShoppingList.aggregate([
                 { 
                     $match: { 
-                        userId: userObjectId, // <--- FILTRO CORRIGIDO: Usa ObjectId
+                        userId: userObjectId, 
                         createdAt: { $gte: chartStartDate, $lte: endDate }
                     } 
                 },

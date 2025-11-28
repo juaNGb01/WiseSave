@@ -39,9 +39,7 @@ const styles = StyleSheet.create({
         fontSize: 25, 
         margin: 5, 
         color: "white",
-        //textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        //textShadowOffset: { width: 2, height: 2 },
-        //textShadowRadius: 5
+    
     }, 
     subText : {
         margin: 5, 
@@ -50,9 +48,7 @@ const styles = StyleSheet.create({
         fontWeight:"medium", 
         fontStyle: "italic", 
 
-        // textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        // textShadowOffset: { width: 2, height: 2 },
-        // textShadowRadius: 5
+    
     }, 
     iconContainer: {
         position: "absolute",

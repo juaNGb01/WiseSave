@@ -16,7 +16,6 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
-// ✅ Defina a URL COM BARRA no final (padrão REST)
 const API_LIST_URL = `${API_URL}/wisesave/lists/`;
 
 export default function ShopListScreen() {
@@ -88,7 +87,6 @@ export default function ShopListScreen() {
     }
 
     try {
-      // ✅ POST com Axios (sem precisar adicionar barra, já está na constante)
       const response = await axios.post(API_LIST_URL, {
         name: listName.trim(),
         items: tempItems,

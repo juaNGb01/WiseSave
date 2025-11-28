@@ -34,7 +34,7 @@ const UpdateDataModal = ({ visible, onClose, mode, currentValue, onSave, isSavin
     }
   };
 
-  // 2. Lógica de Validação e Envio
+
   const handleSave = () => {
     if (!newValue) {
       Alert.alert('Erro', 'O novo valor não pode ser vazio.');
@@ -54,7 +54,6 @@ const UpdateDataModal = ({ visible, onClose, mode, currentValue, onSave, isSavin
       onSave(mode, newValue);
       
     } else if (mode === 'email') {
-      // Validação básica de e-mail (pode ser mais robusta)
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(newValue)) {
         Alert.alert('Erro', 'Por favor, insira um e-mail válido.');
@@ -144,7 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Fundo escuro semi-transparente
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', 
   },
   modalView: {
     width: '85%',

@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20, // Adicionado padding para evitar que o modal cole nas bordas da tela
+    padding: 20,
   },
   modalContainer: {
     width: '100%',
@@ -212,12 +212,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    maxHeight: '80%', // Mantém a altura máxima
-    flex: 1, // MUDANÇA: Permite que o container gerencie o espaço interno
+    maxHeight: '80%', 
+    flex: 1, 
   },
   modalContent: {
-    flex: 1, // MUDANÇA: Faz o conteúdo ocupar toda a altura do container
-    justifyContent: 'space-between', // Garante distribuição correta
+    flex: 1, 
+    justifyContent: 'space-between', 
   },
   header: {
     flexDirection: 'row',
@@ -226,8 +226,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-    backgroundColor: 'white', // Garante que o header fique sobre o scroll se necessário
-    borderTopLeftRadius: 12,
+    backgroundColor: 'white', 
     borderTopRightRadius: 12,
   },
   title: {
@@ -245,7 +244,7 @@ const styles = StyleSheet.create({
   },
   form: {
     padding: 30,
-    flex: 1, // MUDANÇA CRUCIAL: O ScrollView agora empurra os botões para baixo e rola o conteúdo do meio
+    flex: 1, 
   },
   fieldContainer: {
     marginBottom: 16
@@ -320,12 +319,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     gap: 12,
-    borderTopWidth: 1, // MUDANÇA: Borda apenas em cima para separar visualmente
+    borderTopWidth: 1, 
     borderTopColor: '#E5E7EB',
-    backgroundColor: 'white', // Garante opacidade
+    backgroundColor: 'white', 
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
-    // Removida a borda preta de debug que você mencionou
   },
   button: {
     flex: 1,
