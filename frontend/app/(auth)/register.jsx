@@ -39,7 +39,7 @@ export default function RegisterScreen() {
       }
       setLoading(true)
       try {
-        const response = await axios.post(`${API_URL}/wisesave/auth/register`, {
+        const response = await axios.post(`${API_URL}/wisesave/auth/register/`, {
           userName,
           email,
           password

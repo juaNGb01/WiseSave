@@ -1,15 +1,27 @@
 import ShoppingList from '../models/ShoppingList.js';
 import mongoose from 'mongoose';
 
-// --- 1. FUNÇÃO PARA CRIAR UMA NOVA LISTA ---
 export const createList = async (req, res) => {
-  0
-  try {
-    const { name, items } = req.body;
+  // 1. Extrai o novo campo 'userId' do corpo da requisição
+  const { name, items, userId } = req.body; 
 
+  try {
+    // 2. Validação: Checa se o nome e, PRINCIPALMENTE, o userId estão presentes
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: 'O nome da lista é obrigatório.' });
+    }
+    
+    // ⚠️ Validação de Segurança/Obrigatoriedade do Schema
+    if (!userId) {
+        // Usa 401 (Não Autorizado) ou 403 (Proibido) para indicar falta de autenticação/identificação
+        return res.status(401).json({ message: 'O ID do usuário é obrigatório para criar a lista.' });
+    }
+
+    // 3. Cria a nova lista, incluindo o userId
     const newList = new ShoppingList({
-      name: name,
-      items: items
+      name: name.trim(),
+      items: items || [],
+      userId: userId      // <--- O DONO DA LISTA AGORA É SALVO AQUI
     });
 
     await newList.save();
@@ -17,19 +29,35 @@ export const createList = async (req, res) => {
 
   } catch (error) {
     console.error('Erro em createList:', error);
+    // Erros 500 podem incluir falhas de conexão ou falha na validação do ObjectId
     res.status(500).json({ message: 'Erro ao criar a lista.' });
   }
 };
 
 // --- 2. FUNÇÃO PARA BUSCAR TODAS AS LISTAS ---
 export const getAllLists = async (req, res) => {
+  // 1. CAPTURA DO ID DE FORMA SEGURA a partir do middleware
+  const userId = req.userId; // <-- CAPTURANDO A VARIÁVEL QUE O MIDDLEWARE ANEXOU
+
   try {
-    const lists = await ShoppingList.find();
-    res.status(200).json(lists);
+    // ⚠️ Validação: O token deve ter garantido que o ID existe, mas é bom checar.
+    if (!userId) {
+      // Isso só deveria ocorrer se o middleware falhar, mas é uma proteção.
+      return res.status(401).json({ message: 'Acesso negado. ID de usuário não encontrado.' });
+    }
+
+    // 2. FILTRAGEM NO BANCO DE DADOS
+    const userLists = await ShoppingList.find({
+      userId: userId // <-- Filtra APENAS pelas listas desse usuário
+    })
+    .sort({ createdAt: -1 })
+    .exec();
+
+    res.status(200).json(userLists);
 
   } catch (error) {
     console.error('Erro em getAllLists:', error);
-    res.status(500).json({ message: `Erro ao buscar as listas: ${error}` });
+    res.status(500).json({ message: 'Erro ao buscar as listas.' });
   }
 };
 
@@ -91,7 +119,7 @@ export const updateList = async (req, res) => {
     res.status(200).json({ 
       message: 'Total atualizado com sucesso',
       totalPrice: total,
-      list: list // Retorna a lista atualizada se você precisar no frontend
+      list: list // Retorna a lista atualizada 
     });
 
   } catch (error) {

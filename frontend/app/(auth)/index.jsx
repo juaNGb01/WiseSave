@@ -102,7 +102,6 @@ export default function LoginScreen() {
           onChangeText={setPassword}
         />
 
-        <Text style={styles.forgotPasswordText}>esqueceu a senha?</Text>
       </View>
 
       <View style={styles.btnCotainer}>

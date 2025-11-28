@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import EditItemModal from '../../components/listScreen/EditItemModal';
+import EditItemModal from '../../components/listScreen/EditItemModal.jsx';
 
 const API_LIST_URL = `${API_URL}/wisesave/lists`;
 

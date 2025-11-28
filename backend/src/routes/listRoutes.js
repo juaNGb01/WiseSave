@@ -11,21 +11,25 @@ import {
   updateList
   
 } from '../controllers/listController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Define a rota principal: /wisesave/lists
-router.get('/', getAllLists); 
-router.post('/', createList);
+//rota principal: /wisesave/lists
+router.get('/', authenticateToken,  getAllLists); //retornar todas as listas
+router.post('/', createList); //criar lista
 
-// IMPORTANTE: Rotas específicas ANTES das rotas com parâmetros genéricos
+//att uma lista 
 router.put('/updateList/:id', updateList);
 
+//att item especifico da lista
 router.put('/:listId/items/:itemId/update', updateItemInList);
+//marcar item como completo
 router.put('/:listId/items/:itemId', toggleItemCompleted);
 
-// Rotas genéricas com :id por ÚLTIMO
+// retornar lista especifica
 router.get('/:id', getListById);
+//deletar lista
 router.delete('/:id', deleteList);
 
 export default router;

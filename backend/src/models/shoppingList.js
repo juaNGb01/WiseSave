@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Este é o "molde" de como um item individual se parece
+// schema itens da lista
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   quantity: { type: Number, default: 1 },
@@ -9,27 +9,32 @@ const itemSchema = new mongoose.Schema({
   price: {
     type: mongoose.Schema.Types.Decimal128,
     default: 0.0,
-    // Getter: Converte o objeto Decimal128 para um número JavaScript simples ao ler
     get: (v) => parseFloat(v.toString())
   },
 });
 
 itemSchema.set('toJSON', { getters: true });
 
-
+//schema para lista
 const listSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  userId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', 
+        // required: true,
+        index: true
+    },
   createdAt: { type: Date, default: Date.now },
-  items: [itemSchema], // Uma lista de itens que seguem o molde de cima
+  items: [itemSchema], 
   totalPrice: {
     type: mongoose.Schema.Types.Decimal128,
     default: 0.0,
-    // Getter: Converte o objeto Decimal128 para um número JavaScript simples ao ler
     get: (v) => parseFloat(v.toString())
   },
 });
 
-// O Mongoose vai criar a collection chamada 'shoppinglists'
+listSchema.set('toJSON', { getters: true });
+
 const ShoppingList = mongoose.model('ShoppingList', listSchema);
 
 export default ShoppingList;

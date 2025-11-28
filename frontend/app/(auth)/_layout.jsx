@@ -4,7 +4,6 @@ import { Stack } from 'expo-router';
 export default function AuthLayout() {
   return (
     <Stack>
-      {/* Esta screen corresponde ao seu arquivo login.js */}
       <Stack.Screen 
         name="index" 
         options={{ 
@@ -16,10 +15,10 @@ export default function AuthLayout() {
         name="register" 
         options={{ 
           title: "Cadastro",
-          headerShown: false, // Oculta o cabeçalho nesta tela
+          headerShown: false, 
         }} 
       />
-      {/* Adicione outras telas de autenticação aqui (ex: register) */}
+     
     </Stack>
   );
 }

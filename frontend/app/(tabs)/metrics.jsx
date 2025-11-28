@@ -12,11 +12,10 @@ import { BarChart } from 'react-native-gifted-charts';
 import BtnSelection from "@/components/metricsScreen/BtnSelection.jsx";
 import axios from "axios"; // Não esqueça de instalar: npm install axios
 import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const API_METRICS = `${API_URL}/wisesave/metrics/summary`
-
-
 
 const initialBarData = [
   { value: 0, label: '-' },
@@ -35,14 +34,14 @@ const Metrics = () => {
 
 
 
-  // 2. Função para alterar o mês (será passada para o BtnSelection)
+  // 2. Função para alterar o mês - passado pro btn
   const changeMonth = (increment) => {
     const newDate = new Date(currentDate);
     newDate.setMonth(newDate.getMonth() + increment);
     setCurrentDate(newDate);
   };
 
-  // 3. Busca os dados na API sempre que currentDate mudar
+ // Busca os dados na API sempre que currentDate mudar
   useEffect(() => {
     fetchMetrics();
   }, [currentDate]);
@@ -50,39 +49,62 @@ const Metrics = () => {
 
   const fetchMetrics = async () => {
     setIsLoading(true);
+
+    // Variáveis auxiliares para a lógica do gráfico
+    const initialBarData = [ ]; 
+    const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
+    //pega o token 
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) {
+        setIsLoading(false);
+        return console.warn("Sessão não encontrada. Não é possível buscar métricas.");
+    }
+
     try {
-      const month = currentDate.getMonth(); // 0 a 11
-      const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const year = currentDate.getFullYear();
 
-      // Chama a rota: .../summary?month=X&year=Y
-      const response = await axios.get(`${API_METRICS}?month=${month}&year=${year}`);
-      const data = response.data;
-      setMetricsData(data);
+        // req com token
+        const response = await axios.get(`${API_METRICS}?month=${month}&year=${year}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-      // --- MAPEAMENTO DO GRÁFICO ---
-      if (data.chartData) {
-        const formattedChart = data.chartData.map((item) => ({
-          value: item.value,
-          label: item.label.charAt(0).toUpperCase() + item.label.slice(1), // Capitaliza "Jan"
-          frontColor: item.isSelected ? '#17ceceff' : '#9CA3AF', // Destaque pro mês atual
-          topLabelComponent: () => (
-            <Text style={{ color: 'gray', fontSize: 10, marginBottom: 4 }}>
-              {item.value > 0 ? `R$${Math.floor(item.value)}` : ''}
-            </Text>
-          )
-        }));
-        setChartData(formattedChart);
-      }
+        const data = response.data;
+        setMetricsData(data);
+
+        // logica pra mapear o grafico
+        if (data.chartData) {
+            const formattedChart = data.chartData.map((item) => ({
+                value: item.value,
+                // Capitaliza o label (ex: "jan" -> "Jan")
+                label: capitalizeFirstLetter(item.label), 
+                // Destaque visual baseado no campo 'isSelected' que vem do backend
+                frontColor: item.isSelected ? '#17ceceff' : '#9CA3AF', 
+                
+                // Componente que mostra o valor acima da barra (top label)
+                topLabelComponent: () => (
+                    <Text style={{ color: 'gray', fontSize: 10, marginBottom: 4 }}>
+                        {item.value > 0 ? `R$${Math.floor(item.value)}` : ''}
+                    </Text>
+                )
+            }));
+            
+            // 4. ATUALIZAÇÃO DO ESTADO DO GRÁFICO
+            setChartData(formattedChart);
+        }
 
     } catch (error) {
-      console.error("Erro ao buscar métricas:", error);
-      setChartData(initialBarData);
-      // Opcional: Alert.alert("Erro", "Não foi possível carregar os dados.");
-      setMetricsData(null); // Reseta os dados em caso de erro
+        console.error("Erro ao buscar métricas:", error);
+        // Em caso de erro, reseta o gráfico para o estado inicial
+        setChartData(initialBarData); 
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   // 4. Mapeamento Dinâmico: Transforma os dados da API no formato dos Cards
   // Se metricsData for null (carregando ou erro), usa valores zerados/padrão

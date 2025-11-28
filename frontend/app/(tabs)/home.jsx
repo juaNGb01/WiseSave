@@ -7,6 +7,7 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import axios from 'axios'; // Importando apenas o Axios
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 // ✅ ROTA CORRETA (Baseada no seu app.use("/wisesave/lists"))
 const API_LIST_URL = `${API_URL}/wisesave/lists`; 
@@ -58,20 +59,41 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [lists, setLists] = useState([]);
 
-  // 1. BUSCAR LISTAS (Com Axios)
   const fetchLists = async () => {
-    setIsLoading(true);
-    try {
-      // O Axios já trata o JSON automaticamente e lança erro se não for 2xx
-      const response = await axios.get(API_LIST_URL+'/');
-      setLists(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar listas:", error);
-      Alert.alert("Erro", "Não foi possível carregar suas listas.");
-    } finally {
+  setIsLoading(true);
+  
+  // 1. RECUPERAR O TOKEN DO ARMAZENAMENTO LOCAL
+  const token = await AsyncStorage.getItem("token"); // Adapte a chave se for diferente ("userToken")
+
+  if (!token) {
       setIsLoading(false);
+      // Aqui você pode redirecionar para a tela de login
+      return Alert.alert("Sessão Expirada", "Faça login novamente.");
+  }
+
+  try {
+    // 2. ENVIAR O TOKEN NO CABEÇALHO 'Authorization'
+    const response = await axios.get(API_LIST_URL + '/', {
+      headers: {
+        // Formato padrão esperado pelo middleware: Bearer <token>
+        Authorization: `Bearer ${token}`, 
+      },
+    });
+    
+    setLists(response.data);
+
+  } catch (error) {
+    console.error("Erro ao buscar listas:", error);
+    // 401/403: Token inválido
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        Alert.alert("Acesso Negado", "Sua sessão expirou ou é inválida.");
+    } else {
+        Alert.alert("Erro", "Não foi possível carregar suas listas.");
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useFocusEffect(
     useCallback(() => {

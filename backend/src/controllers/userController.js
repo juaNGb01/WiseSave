@@ -1,10 +1,11 @@
 import User from "../models/User.js";
 import jwt from 'jsonwebtoken';
+
 // Buscar perfil do usuário 
 export const getUserProfile = async (req, res) => {
   try {
 
-    // req.userId foi adicionado pelo middleware
+    
     const user = await User.findById(req.userId).select("-password");
 
     if (!user) {
@@ -49,7 +50,7 @@ export const updateUser = async (req, res) => {
     const token = jwt.sign(
       { userId: updatedUser._id, name: updatedUser.name, email: updatedUser.email },
       process.env.JWT_SECRET,
-      { expiresIn: '1d' } // Use o mesmo tempo de expiração do login
+      { expiresIn: '1d' } 
     );
 
     console.log("✅ Usuário atualizado e novo token gerado");
@@ -57,7 +58,7 @@ export const updateUser = async (req, res) => {
     res.status(200).json({
       message: "Usuário atualizado",
       user: updatedUser,
-      token: token // **RETORNE O NOVO TOKEN**
+      token: token 
     });
 
   } catch (error) {

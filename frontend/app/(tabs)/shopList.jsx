@@ -1,5 +1,5 @@
 import { API_URL } from '@env';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
 // ✅ Defina a URL COM BARRA no final (padrão REST)
@@ -26,6 +27,25 @@ export default function ShopListScreen() {
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState("un");
   const [tempItems, setTempItems] = useState([]);
+  const [user, setUser] = useState(null)
+  
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      if (userData) {
+        setUser(JSON.parse(userData).id);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar usuário:", error);
+    }
+  };
+
+
+
 
   const handleAddItemToList = () => {
     if (itemName.trim() === "") {
@@ -53,7 +73,7 @@ export default function ShopListScreen() {
     setTempItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  // ✅ Usando AXIOS (igual no outro arquivo)
+  //  Finalizar e salvar lista
   const handleFinish = async () => {
     // Validação do nome da lista
     if (listName.trim() === "") {
@@ -71,7 +91,8 @@ export default function ShopListScreen() {
       // ✅ POST com Axios (sem precisar adicionar barra, já está na constante)
       const response = await axios.post(API_LIST_URL, {
         name: listName.trim(),
-        items: tempItems
+        items: tempItems,
+        userId: user
       });
 
       // Sucesso
@@ -91,7 +112,7 @@ export default function ShopListScreen() {
 
       {/* --- FORMULÁRIO --- */}
       <View style={styles.formContainer}>
-          <TextInput
+        <TextInput
           style={styles.input}
           placeholder="Nome da lista"
           value={listName}
@@ -204,7 +225,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     marginBottom: 5,
-    
+
   },
   inputQuantity: {
     flex: 1,
